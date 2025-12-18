@@ -26,5 +26,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-// Use local pedantigo for development
-replace github.com/SmrutAI/pedantigo => ../
+replace github.com/SmrutAI/pedantigo => ../Pedantigo

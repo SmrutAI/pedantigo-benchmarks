@@ -1,1 +1,32 @@
+# Benchmark outputs
 report.csv
+benchmark-output.txt
+
+# Cloned repos (CI)
+pedantigo-src/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.work.sum
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
