@@ -40,6 +40,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.PEDANTIGO_PR_TOKEN }}
           header: benchmark-results
-          repo: SmrutAI/pedantigo
+          owner: SmrutAI
+          repo: pedantigo
           number: ${{ github.event.client_payload.pr_number }}
           path: BENCHMARK_PR.md
