@@ -4,6 +4,10 @@ on:
   repository_dispatch:
     types: [pedantigo-pr]
 
+concurrency:
+  group: benchmark-pedantigo-pr-${{ github.event.client_payload.pr_number }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
