@@ -37,4 +37,4 @@ jobs:
           token: ${{ secrets.PEDANTIGO_PR_TOKEN }}
           repository: SmrutAI/pedantigo
           issue-number: ${{ github.event.client_payload.pr_number }}
-          body-path: BENCHMARK.md
+          body-path: BENCHMARK_PR.md
