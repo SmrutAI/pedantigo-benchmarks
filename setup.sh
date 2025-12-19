@@ -14,7 +14,12 @@ else
     git clone --depth 1 https://github.com/SmrutAI/pedantigo.git "$THIRD_PARTY/pedantigo"
 fi
 
-echo "Running go mod tidy..."
-go mod tidy
+# Only run go mod tidy if vendor doesn't exist
+if [ ! -d "vendor" ]; then
+    echo "Running go mod tidy..."
+    go mod tidy
+else
+    echo "Using vendored dependencies"
+fi
 
 echo "Setup complete!"
