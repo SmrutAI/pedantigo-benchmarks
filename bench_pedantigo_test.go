@@ -1,6 +1,7 @@
 package benchmarks
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/SmrutAI/pedantigo"
@@ -72,17 +73,37 @@ func Benchmark_Pedantigo_UnmarshalMap_Complex(b *testing.B) {
 }
 
 // ----------------------------------------------------------------------------
-// Playground-only features (Skip)
+// UnmarshalDirect (json.Unmarshal + Validate)
 // ----------------------------------------------------------------------------
 
-// Benchmark_Pedantigo_UnmarshalDirect_Simple - Not applicable to Pedantigo
+// Benchmark_Pedantigo_UnmarshalDirect_Simple tests stdlib json.Unmarshal + Validate
 func Benchmark_Pedantigo_UnmarshalDirect_Simple(b *testing.B) {
-	b.Skip("UnmarshalDirect is a Playground-only pattern (json.Unmarshal + Struct)")
+	var user UserPedantigo
+	_ = json.Unmarshal(ValidUserJSON, &user)
+	_ = pedantigo.Validate(&user)
+
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		var u UserPedantigo
+		_ = json.Unmarshal(ValidUserJSON, &u)
+		_ = pedantigo.Validate(&u)
+	}
 }
 
-// Benchmark_Pedantigo_UnmarshalDirect_Complex - Not applicable to Pedantigo
+// Benchmark_Pedantigo_UnmarshalDirect_Complex tests stdlib json.Unmarshal + Validate for nested
 func Benchmark_Pedantigo_UnmarshalDirect_Complex(b *testing.B) {
-	b.Skip("UnmarshalDirect is a Playground-only pattern (json.Unmarshal + Struct)")
+	var order OrderPedantigo
+	_ = json.Unmarshal(ValidOrderJSON, &order)
+	_ = pedantigo.Validate(&order)
+
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		var o OrderPedantigo
+		_ = json.Unmarshal(ValidOrderJSON, &o)
+		_ = pedantigo.Validate(&o)
+	}
 }
 
 // ----------------------------------------------------------------------------

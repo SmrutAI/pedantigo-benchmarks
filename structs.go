@@ -98,6 +98,60 @@ type UserHuma struct {
 	Username string `json:"username" minLength:"3" maxLength:"20" pattern:"^[a-zA-Z0-9]+$"`
 }
 
+// Huma nested types for Complex benchmark
+type AddressHuma struct {
+	Street  string `json:"street" minLength:"5" required:"true"`
+	City    string `json:"city" required:"true"`
+	Country string `json:"country" minLength:"2" maxLength:"2" required:"true"`
+	Zip     string `json:"zip" required:"true"`
+}
+
+type CustomerHuma struct {
+	ID      string      `json:"id" format:"uuid" required:"true"`
+	Name    string      `json:"name" minLength:"2" required:"true"`
+	Email   string      `json:"email" format:"email" required:"true"`
+	Address AddressHuma `json:"address" required:"true"`
+}
+
+type OrderItemHuma struct {
+	SKU      string  `json:"sku" minLength:"3" required:"true"`
+	Name     string  `json:"name" required:"true"`
+	Quantity int     `json:"quantity" minimum:"1" required:"true"`
+	Price    float64 `json:"price" exclusiveMinimum:"0" required:"true"`
+}
+
+type OrderHuma struct {
+	ID       string          `json:"id" format:"uuid" required:"true"`
+	Customer CustomerHuma    `json:"customer" required:"true"`
+	Items    []OrderItemHuma `json:"items" minItems:"1" required:"true"`
+	Total    float64         `json:"total" exclusiveMinimum:"0" required:"true"`
+	Notes    string          `json:"notes" maxLength:"500"`
+}
+
+// Huma Config type for Large benchmark
+type ConfigHuma struct {
+	AppName        string `json:"app_name" minLength:"1" maxLength:"100" required:"true"`
+	Version        string `json:"version" required:"true"`
+	Environment    string `json:"environment" enum:"dev,staging,prod" required:"true"`
+	Debug          bool   `json:"debug"`
+	LogLevel       string `json:"log_level" enum:"debug,info,warn,error"`
+	Port           int    `json:"port" minimum:"1" maximum:"65535" required:"true"`
+	Host           string `json:"host" required:"true"`
+	DatabaseURL    string `json:"database_url" format:"uri" required:"true"`
+	RedisURL       string `json:"redis_url" format:"uri"`
+	MaxConnections int    `json:"max_connections" minimum:"1" maximum:"1000"`
+	Timeout        int    `json:"timeout" minimum:"1" maximum:"300"`
+	RetryCount     int    `json:"retry_count" minimum:"0" maximum:"10"`
+	CacheEnabled   bool   `json:"cache_enabled"`
+	CacheTTL       int    `json:"cache_ttl" minimum:"0"`
+	RateLimit      int    `json:"rate_limit" minimum:"0"`
+	APIKey         string `json:"api_key" minLength:"32" required:"true"`
+	SecretKey      string `json:"secret_key" minLength:"32" required:"true"`
+	AllowedOrigins string `json:"allowed_origins"`
+	EnableMetrics  bool   `json:"enable_metrics"`
+	MetricsPort    int    `json:"metrics_port" minimum:"1" maximum:"65535"`
+}
+
 // ----------------------------------------------------------------------------
 // Complex Order (nested structs, arrays)
 // ----------------------------------------------------------------------------
@@ -246,6 +300,58 @@ var ValidUserOzzo = UserOzzo{
 	Age:      30,
 	Website:  "https://alice.dev",
 	Username: "alice123",
+}
+
+var ValidUserHuma = UserHuma{
+	Name:     "Alice Smith",
+	Email:    "alice@example.com",
+	Age:      30,
+	Website:  "https://alice.dev",
+	Username: "alice123",
+}
+
+var ValidOrderHuma = OrderHuma{
+	ID: "550e8400-e29b-41d4-a716-446655440000",
+	Customer: CustomerHuma{
+		ID:    "550e8400-e29b-41d4-a716-446655440001",
+		Name:  "John Doe",
+		Email: "john@example.com",
+		Address: AddressHuma{
+			Street:  "123 Main Street",
+			City:    "New York",
+			Country: "US",
+			Zip:     "10001",
+		},
+	},
+	Items: []OrderItemHuma{
+		{SKU: "PROD-001", Name: "Widget", Quantity: 2, Price: 29.99},
+		{SKU: "PROD-002", Name: "Gadget", Quantity: 1, Price: 49.99},
+	},
+	Total: 109.97,
+	Notes: "Please deliver before 5pm",
+}
+
+var ValidConfigHuma = ConfigHuma{
+	AppName:        "MyApp",
+	Version:        "1.0.0",
+	Environment:    "prod",
+	Debug:          false,
+	LogLevel:       "info",
+	Port:           8080,
+	Host:           "0.0.0.0",
+	DatabaseURL:    "https://db.example.com/mydb",
+	RedisURL:       "https://redis.example.com",
+	MaxConnections: 100,
+	Timeout:        30,
+	RetryCount:     3,
+	CacheEnabled:   true,
+	CacheTTL:       3600,
+	RateLimit:      1000,
+	APIKey:         "abcdefghijklmnopqrstuvwxyz123456",
+	SecretKey:      "123456abcdefghijklmnopqrstuvwxyz",
+	AllowedOrigins: "*",
+	EnableMetrics:  true,
+	MetricsPort:    9090,
 }
 
 var ValidOrderOzzo = OrderOzzo{

@@ -89,8 +89,8 @@ func generateMarkdown(results []BenchmarkResult) {
 	// Feature descriptions
 	featureDesc := map[string]string{
 		"Validate":        "Validate existing struct (no JSON parsing)",
-		"UnmarshalMap":    "Pedantigo-only: JSON → map → struct + validate",
-		"UnmarshalDirect": "Playground-only: json.Unmarshal + Struct validate",
+		"UnmarshalMap":    "JSON → map → struct + validate",
+		"UnmarshalDirect": "json.Unmarshal + Validate (bypass, no map conversion)",
 		"New":             "Validator creation overhead",
 		"Schema":          "JSON Schema generation",
 		"Marshal":         "Validate + JSON marshal",
