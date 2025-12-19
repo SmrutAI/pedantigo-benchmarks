@@ -37,3 +37,10 @@ jobs:
           git add BENCHMARK.md
           git diff --staged --quiet || git commit -m "chore: update benchmark report"
           git push
+
+      - name: Trigger docs rebuild
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DOCS_TRIGGER_TOKEN }}
+          repository: SmrutAI/pedantigo-docs
+          event-type: benchmarks-updated
