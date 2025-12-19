@@ -5,6 +5,9 @@ on:
     types: [pedantigo-updated]
   workflow_dispatch:  # Manual trigger
 
+permissions:
+  contents: write
+
 jobs:
   benchmark:
     runs-on: ubuntu-latest
