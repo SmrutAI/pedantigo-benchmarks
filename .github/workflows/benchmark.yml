@@ -7,6 +7,10 @@ on:
     types: [pedantigo-updated]
   workflow_dispatch:  # Manual trigger
 
+concurrency:
+  group: benchmark-main
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
