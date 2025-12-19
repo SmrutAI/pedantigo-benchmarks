@@ -16,6 +16,9 @@ third_party/
 go.work
 go.work.sum
 
+# Binary
+/report
+
 # IDE
 .idea/
 .vscode/

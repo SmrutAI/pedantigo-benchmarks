@@ -36,6 +36,8 @@ func Benchmark_Huma_Validate_Large(b *testing.B) {
 // ----------------------------------------------------------------------------
 
 // Benchmark_Huma_UnmarshalMap_Simple tests JSON→map→validate (Huma's real API flow)
+// NOTE: Huma only validates the map - it does NOT convert to a typed struct.
+// This is less work than Pedantigo which parses JSON, validates, AND outputs a typed struct.
 func Benchmark_Huma_UnmarshalMap_Simple(b *testing.B) {
 	registry := huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer)
 	schema := registry.Schema(reflect.TypeOf(UserHuma{}), true, "")
@@ -59,6 +61,8 @@ func Benchmark_Huma_UnmarshalMap_Simple(b *testing.B) {
 }
 
 // Benchmark_Huma_UnmarshalMap_Complex tests JSON→map→validate for nested structs
+// NOTE: Huma only validates the map - it does NOT convert to a typed struct.
+// This is less work than Pedantigo which parses JSON, validates, AND outputs a typed struct.
 func Benchmark_Huma_UnmarshalMap_Complex(b *testing.B) {
 	registry := huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer)
 	schema := registry.Schema(reflect.TypeOf(OrderHuma{}), true, "")

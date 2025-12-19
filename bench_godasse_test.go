@@ -13,51 +13,22 @@ import (
 // ============================================================================
 
 // ----------------------------------------------------------------------------
-// Core Comparison (Apples-to-Apples with Pedantigo/Playground)
-// Note: godasse is a deserializer with validation interface, not a standalone
-// validator. For fair comparison we benchmark the Validate() method directly.
+// Validate (Not applicable - godasse requires hand-written Validate() methods)
 // ----------------------------------------------------------------------------
 
-// Benchmark_Godasse_Validate_Simple validates an existing 5-field struct
+// Benchmark_Godasse_Validate_Simple - godasse doesn't have tag-based validation
 func Benchmark_Godasse_Validate_Simple(b *testing.B) {
-	user := ValidUserGodasse
-
-	// warm
-	_ = user.Validate()
-
-	b.ResetTimer()
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		_ = user.Validate()
-	}
+	b.Skip("godasse requires hand-written Validate() methods, not comparable to tag-based validation")
 }
 
-// Benchmark_Godasse_Validate_Complex validates nested order struct
+// Benchmark_Godasse_Validate_Complex - godasse doesn't have tag-based validation
 func Benchmark_Godasse_Validate_Complex(b *testing.B) {
-	order := ValidOrderGodasse
-
-	// warm
-	_ = order.Validate()
-
-	b.ResetTimer()
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		_ = order.Validate()
-	}
+	b.Skip("godasse requires hand-written Validate() methods, not comparable to tag-based validation")
 }
 
-// Benchmark_Godasse_Validate_Large validates 20-field config struct
+// Benchmark_Godasse_Validate_Large - godasse doesn't have tag-based validation
 func Benchmark_Godasse_Validate_Large(b *testing.B) {
-	config := ValidConfigGodasse
-
-	// warm
-	_ = config.Validate()
-
-	b.ResetTimer()
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		_ = config.Validate()
-	}
+	b.Skip("godasse requires hand-written Validate() methods, not comparable to tag-based validation")
 }
 
 // ----------------------------------------------------------------------------
@@ -65,6 +36,8 @@ func Benchmark_Godasse_Validate_Large(b *testing.B) {
 // ----------------------------------------------------------------------------
 
 // Benchmark_Godasse_UnmarshalMap_Simple - JSON -> map -> struct + validate
+// NOTE: JSON parsing is included in the timer for fair comparison with Pedantigo,
+// which also parses JSON inside its Unmarshal function.
 func Benchmark_Godasse_UnmarshalMap_Simple(b *testing.B) {
 	deserializer, err := deserialize.MakeMapDeserializer[UserGodasse](deserialize.Options{
 		Unmarshaler: jsonPkg.Driver,
@@ -74,24 +47,26 @@ func Benchmark_Godasse_UnmarshalMap_Simple(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	// Pre-parse JSON to map
 	jsonData := ValidUserJSON
-	dict := make(jsonPkg.JSON)
-	if err := json.Unmarshal(jsonData, &dict); err != nil {
-		b.Fatal(err)
-	}
 
 	// warm
+	dict := make(jsonPkg.JSON)
+	_ = json.Unmarshal(jsonData, &dict)
 	_, _ = deserializer.DeserializeDict(dict)
 
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
+		// Include JSON parsing for fair comparison - Pedantigo.Unmarshal also parses JSON
+		dict := make(jsonPkg.JSON)
+		_ = json.Unmarshal(jsonData, &dict)
 		_, _ = deserializer.DeserializeDict(dict)
 	}
 }
 
 // Benchmark_Godasse_UnmarshalMap_Complex - JSON -> map -> struct + validate
+// NOTE: JSON parsing is included in the timer for fair comparison with Pedantigo,
+// which also parses JSON inside its Unmarshal function.
 func Benchmark_Godasse_UnmarshalMap_Complex(b *testing.B) {
 	deserializer, err := deserialize.MakeMapDeserializer[OrderGodasse](deserialize.Options{
 		Unmarshaler: jsonPkg.Driver,
@@ -101,19 +76,19 @@ func Benchmark_Godasse_UnmarshalMap_Complex(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	// Pre-parse JSON to map
 	jsonData := ValidOrderJSON
-	dict := make(jsonPkg.JSON)
-	if err := json.Unmarshal(jsonData, &dict); err != nil {
-		b.Fatal(err)
-	}
 
 	// warm
+	dict := make(jsonPkg.JSON)
+	_ = json.Unmarshal(jsonData, &dict)
 	_, _ = deserializer.DeserializeDict(dict)
 
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
+		// Include JSON parsing for fair comparison - Pedantigo.Unmarshal also parses JSON
+		dict := make(jsonPkg.JSON)
+		_ = json.Unmarshal(jsonData, &dict)
 		_, _ = deserializer.DeserializeDict(dict)
 	}
 }
