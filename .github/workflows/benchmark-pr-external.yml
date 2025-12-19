@@ -1,0 +1,40 @@
+name: Benchmark PR (Pedantigo)
+
+on:
+  repository_dispatch:
+    types: [pedantigo-pr]
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout benchmarks (main)
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Clone pedantigo (PR branch)
+        env:
+          BRANCH: ${{ github.event.client_payload.branch }}
+        run: |
+          mkdir -p third_party
+          git clone --depth 1 --branch "$BRANCH" https://github.com/SmrutAI/pedantigo.git third_party/pedantigo
+
+      - name: Run benchmarks
+        run: |
+          go mod tidy
+          make bench COUNT=50
+
+      - name: Comment on pedantigo PR
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.PEDANTIGO_PR_TOKEN }}
+          repository: SmrutAI/pedantigo
+          issue-number: ${{ github.event.client_payload.pr_number }}
+          body-path: BENCHMARK.md
