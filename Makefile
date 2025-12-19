@@ -1,11 +1,11 @@
 # Pedantigo Benchmarks Makefile
-# Usage: make bench      # Run full benchmarks (count=20)
+# Usage: make bench      # Run benchmarks (count=7)
 #        make bench-quick # Quick test (count=3)
 #        make setup      # Clone pedantigo to third_party/
 #        make vendor     # Vendor dependencies
 #        make report     # Generate report from existing output
 
-COUNT ?= 20
+COUNT ?= 7
 
 .PHONY: bench bench-quick setup vendor report clean help
 
@@ -43,10 +43,10 @@ help:
 	@echo "Usage:"
 	@echo "  make setup          Clone pedantigo to third_party/"
 	@echo "  make vendor         Vendor all dependencies"
-	@echo "  make bench          Run full benchmarks (count=20)"
+	@echo "  make bench          Run benchmarks (count=7)"
 	@echo "  make bench-quick    Quick test (count=3)"
 	@echo "  make report         Generate report from existing output"
 	@echo "  make clean          Remove generated files"
 	@echo ""
 	@echo "Variables:"
-	@echo "  COUNT               Benchmark iterations (default: 20)"
+	@echo "  COUNT               Benchmark iterations (default: 7)"

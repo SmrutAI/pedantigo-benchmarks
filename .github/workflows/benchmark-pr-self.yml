@@ -32,7 +32,7 @@ jobs:
       - name: Run benchmarks
         run: |
           go mod tidy
-          make bench COUNT=15
+          make bench COUNT=7
 
       - name: Comment on PR
         uses: marocchino/sticky-pull-request-comment@v2
