@@ -1,6 +1,8 @@
 name: Benchmarks
 
 on:
+  push:
+    branches: [main]
   repository_dispatch:
     types: [pedantigo-updated]
   workflow_dispatch:  # Manual trigger
