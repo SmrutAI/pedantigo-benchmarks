@@ -32,9 +32,10 @@ jobs:
           make bench COUNT=50
 
       - name: Comment on pedantigo PR
-        uses: peter-evans/create-or-update-comment@v4
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
-          token: ${{ secrets.PEDANTIGO_PR_TOKEN }}
-          repository: SmrutAI/pedantigo
-          issue-number: ${{ github.event.client_payload.pr_number }}
-          body-path: BENCHMARK_PR.md
+          GITHUB_TOKEN: ${{ secrets.PEDANTIGO_PR_TOKEN }}
+          header: benchmark-results
+          repo: SmrutAI/pedantigo
+          number: ${{ github.event.client_payload.pr_number }}
+          path: BENCHMARK_PR.md
