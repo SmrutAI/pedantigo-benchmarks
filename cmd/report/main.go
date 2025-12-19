@@ -80,11 +80,21 @@ func generateMarkdown(results []BenchmarkResult) {
 	}
 	sort.Strings(features)
 
+	// Print Docusaurus frontmatter (required for docs site)
+	fmt.Println("---")
+	fmt.Println("sidebar_position: 99")
+	fmt.Println("title: Benchmarks")
+	fmt.Println("---")
+	fmt.Println()
+
 	// Print header
 	fmt.Println("# Benchmark Results")
 	fmt.Println()
 	fmt.Printf("Generated: %s\n", time.Now().UTC().Format("2006-01-02 15:04:05 UTC"))
 	fmt.Println()
+
+	// Print library notes
+	printLibraryNotes()
 
 	// Feature descriptions
 	featureDesc := map[string]string{
@@ -207,83 +217,111 @@ func formatNs(ns float64) string {
 	return fmt.Sprintf("%.0f ns", ns)
 }
 
+func printLibraryNotes() {
+	fmt.Println("## Library Notes")
+	fmt.Println()
+	fmt.Println("### Feature Comparison")
+	fmt.Println()
+	fmt.Println("| Feature | Pedantigo | Playground | Ozzo | Huma | Godantic | Godasse |")
+	fmt.Println("|---------|-----------|------------|------|------|----------|---------|")
+	fmt.Println("| Declarative constraints | ✅ tags | ✅ tags | ✅ rules | ✅ tags | ✅ methods | ❌ hand-written |")
+	fmt.Println("| JSON Schema generation | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |")
+	fmt.Println("| Default values | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ |")
+	fmt.Println("| Unmarshal + validate | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ |")
+	fmt.Println("| Validate existing struct | ✅ | ✅ | ✅ | ❌ | ✅ | ❌* |")
+	fmt.Println()
+	fmt.Println("_*Godasse requires hand-written `Validate()` methods_")
+	fmt.Println()
+	fmt.Println("### Library Descriptions")
+	fmt.Println()
+	fmt.Println("1. **Pedantigo** - Struct tag-based validation (`validate:\"required,email,min=5\"`). JSON Schema generation with caching.")
+	fmt.Println()
+	fmt.Println("2. **Playground** (go-playground/validator) - Struct tag-based validation. Rich constraint library, no JSON Schema.")
+	fmt.Println()
+	fmt.Println("3. **Ozzo** (ozzo-validation) - Rule builder API (`validation.Field(&u.Name, validation.Required, validation.Length(2,100))`). No struct tags.")
+	fmt.Println()
+	fmt.Println("4. **Huma** - OpenAPI-focused. Validates `map[string]any` against schemas, not structs directly.")
+	fmt.Println()
+	fmt.Println("5. **Godantic** - Method-based constraints (`FieldName() FieldOptions[T]`). JSON Schema, defaults, streaming partial JSON.")
+	fmt.Println()
+	fmt.Println("6. **Godasse** - Deserializer with `default:` tag. All constraint validation requires hand-written `Validate()` methods.")
+	fmt.Println()
+	fmt.Println("---")
+	fmt.Println()
+}
+
 func printSummary(results []BenchmarkResult) {
 	fmt.Println("---")
 	fmt.Println()
 	fmt.Println("## Summary")
 	fmt.Println()
 
-	// Group by library
-	byLibrary := make(map[string][]BenchmarkResult)
-	for _, r := range results {
-		byLibrary[r.Library] = append(byLibrary[r.Library], r)
+	// Print comparison for each key benchmark
+	summaryBenchmarks := []struct {
+		feature string
+		struct_ string
+		title   string
+	}{
+		{"Validate", "Simple", "Validate_Simple (struct validation)"},
+		{"Validate", "Complex", "Validate_Complex (nested structs)"},
+		{"UnmarshalMap", "Simple", "UnmarshalMap_Simple (JSON → struct + validate)"},
+		{"UnmarshalMap", "Complex", "UnmarshalMap_Complex (nested JSON)"},
+		{"Schema", "Uncached", "Schema_Uncached (first-time generation)"},
+		{"Schema", "Cached", "Schema_Cached (cached lookup)"},
 	}
 
-	// Find Pedantigo baseline for Validate_Simple
-	var pedantigoValidateSimple *BenchmarkResult
-	for _, r := range results {
-		if r.Library == "Pedantigo" && r.Feature == "Validate" && r.Struct == "Simple" {
-			pedantigoValidateSimple = &r
+	for _, bench := range summaryBenchmarks {
+		printComparisonTable(results, bench.feature, bench.struct_, bench.title)
+	}
+
+	printLegend()
+}
+
+func printComparisonTable(results []BenchmarkResult, feature, struct_, title string) {
+	// Find Pedantigo baseline
+	var baseline *BenchmarkResult
+	for i := range results {
+		if results[i].Library == "Pedantigo" && results[i].Feature == feature && results[i].Struct == struct_ {
+			baseline = &results[i]
 			break
 		}
 	}
 
-	if pedantigoValidateSimple == nil {
-		fmt.Println("_No Pedantigo baseline found_")
-		return
+	if baseline == nil {
+		return // Skip if no Pedantigo baseline
 	}
 
-	fmt.Println("### Validate_Simple Comparison")
+	fmt.Printf("### %s\n", title)
 	fmt.Println()
-	fmt.Printf("| Library | ns/op | vs Pedantigo |\n")
-	fmt.Printf("|---------|-------|-------------|\n")
+	fmt.Printf("| Library | ns/op | allocs | vs Pedantigo |\n")
+	fmt.Printf("|---------|-------|--------|-------------|\n")
 
 	for _, lib := range allLibraries {
 		found := false
 		for _, r := range results {
-			if r.Library == lib && r.Feature == "Validate" && r.Struct == "Simple" {
-				ratio := r.NsPerOp / pedantigoValidateSimple.NsPerOp
+			if r.Library == lib && r.Feature == feature && r.Struct == struct_ {
+				ratio := r.NsPerOp / baseline.NsPerOp
 				var comparison string
-				if ratio < 1.0 {
-					comparison = fmt.Sprintf("%.2fx faster", 1.0/ratio)
-				} else if ratio > 1.0 {
-					comparison = fmt.Sprintf("%.2fx slower", ratio)
-				} else {
+				if lib == "Pedantigo" {
 					comparison = "baseline"
+				} else if ratio < 1.0 {
+					comparison = fmt.Sprintf("%.2fx faster", 1.0/ratio)
+				} else {
+					comparison = fmt.Sprintf("%.2fx slower", ratio)
 				}
-				fmt.Printf("| %s | %s | %s |\n", lib, formatNs(r.NsPerOp), comparison)
+				fmt.Printf("| %s | %s | %d | %s |\n", lib, formatNs(r.NsPerOp), r.AllocsOp, comparison)
 				found = true
 				break
 			}
 		}
 		if !found {
-			fmt.Printf("| %s | unsupported | unsupported |\n", lib)
+			fmt.Printf("| %s | - | - | - |\n", lib)
 		}
 	}
 	fmt.Println()
+}
 
-	// Print allocations summary
-	fmt.Println("### Allocations (Validate_Simple)")
-	fmt.Println()
-	fmt.Printf("| Library | B/op | allocs/op |\n")
-	fmt.Printf("|---------|------|----------|\n")
-
-	for _, lib := range allLibraries {
-		found := false
-		for _, r := range results {
-			if r.Library == lib && r.Feature == "Validate" && r.Struct == "Simple" {
-				fmt.Printf("| %s | %d | %d |\n", lib, r.BytesOp, r.AllocsOp)
-				found = true
-				break
-			}
-		}
-		if !found {
-			fmt.Printf("| %s | unsupported | unsupported |\n", lib)
-		}
-	}
-	fmt.Println()
-
-	// Legend
+func printLegend() {
 	fmt.Println("---")
 	fmt.Println()
 	fmt.Println("_Generated by pedantigo-benchmarks_")
