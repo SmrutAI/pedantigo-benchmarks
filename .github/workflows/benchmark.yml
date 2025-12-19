@@ -39,7 +39,15 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add BENCHMARK.md
           git diff --staged --quiet || git commit -m "chore: update benchmark report"
-          git push
+
+          # Try rebase, abort and fail if conflicts occur
+          if git pull --rebase; then
+            git push
+          else
+            echo "::error::Rebase failed (likely conflicts). Manual intervention required."
+            git rebase --abort || true
+            exit 1
+          fi
 
       - name: Trigger docs rebuild
         uses: peter-evans/repository-dispatch@v3
