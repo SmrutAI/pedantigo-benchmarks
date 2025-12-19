@@ -5,7 +5,7 @@ title: Benchmarks
 
 # Benchmark Results
 
-Generated: 2025-12-19 17:44:35 UTC
+Generated: 2025-12-19 19:09:50 UTC
 
 ## Library Notes
 
@@ -42,25 +42,25 @@ _Validator creation overhead_
 
 | Struct | Pedantigo | Playground | Ozzo | Huma | Godantic | Godasse |
 |--------|--------|--------|--------|--------|--------|--------|
-| Simple | unsupported | unsupported | unsupported | unsupported | 26.04 µs (305 allocs) | 6.79 µs (72 allocs) |
-| Complex | unsupported | unsupported | unsupported | unsupported | 7.59 µs (75 allocs) | 23.61 µs (243 allocs) |
+| Simple | unsupported | unsupported | unsupported | unsupported | 26.42 µs (305 allocs) | 6.76 µs (72 allocs) |
+| Complex | unsupported | unsupported | unsupported | unsupported | 7.48 µs (75 allocs) | 23.29 µs (243 allocs) |
 
 ## UnmarshalMap
 _JSON → map → validate (Pedantigo validates and outputs struct, Huma only validates the map)_
 
 | Struct | Pedantigo | Playground | Ozzo | Huma | Godantic | Godasse |
 |--------|--------|--------|--------|--------|--------|--------|
-| Simple | unsupported | unsupported | unsupported | 3.39 µs (26 allocs) | unsupported | 5.41 µs (46 allocs) |
-| Complex | unsupported | unsupported | unsupported | unsupported | unsupported | 16.85 µs (153 allocs) |
+| Simple | unsupported | unsupported | unsupported | 3.51 µs (26 allocs) | unsupported | 5.40 µs (46 allocs) |
+| Complex | unsupported | unsupported | unsupported | unsupported | unsupported | 17.18 µs (153 allocs) |
 
 ## Validate
 _Validate existing struct (no JSON parsing)_
 
 | Struct | Pedantigo | Playground | Ozzo | Huma | Godantic | Godasse |
 |--------|--------|--------|--------|--------|--------|--------|
-| Simple | unsupported | unsupported | unsupported | unsupported | 6.24 µs (48 allocs) | unsupported |
-| Complex | unsupported | unsupported | unsupported | unsupported | 14.10 µs (120 allocs) | unsupported |
-| Large | unsupported | unsupported | unsupported | unsupported | 15.21 µs (126 allocs) | unsupported |
+| Simple | unsupported | unsupported | unsupported | unsupported | 5.96 µs (48 allocs) | unsupported |
+| Complex | unsupported | unsupported | unsupported | unsupported | 13.71 µs (120 allocs) | unsupported |
+| Large | unsupported | unsupported | unsupported | unsupported | 14.60 µs (126 allocs) | unsupported |
 
 ---
 
