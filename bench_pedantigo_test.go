@@ -150,6 +150,29 @@ func Benchmark_Pedantigo_Schema_Cached(b *testing.B) {
 }
 
 // ----------------------------------------------------------------------------
+// OpenAPI Schema Generation
+// ----------------------------------------------------------------------------
+
+// Benchmark_Pedantigo_OpenAPI_Uncached measures first-call OpenAPI schema generation
+func Benchmark_Pedantigo_OpenAPI_Uncached(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		v := pedantigo.New[UserPedantigo]()
+		_ = v.SchemaOpenAPI()
+	}
+}
+
+// Benchmark_Pedantigo_OpenAPI_Cached measures cached OpenAPI schema retrieval
+func Benchmark_Pedantigo_OpenAPI_Cached(b *testing.B) {
+	_ = pedantigo.SchemaOpenAPI[UserPedantigo]() // warm cache
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		_ = pedantigo.SchemaOpenAPI[UserPedantigo]()
+	}
+}
+
+// ----------------------------------------------------------------------------
 // Marshal (Validate + JSON output)
 // ----------------------------------------------------------------------------
 

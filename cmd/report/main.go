@@ -89,10 +89,11 @@ func generateMarkdown(results []BenchmarkResult) {
 	// Feature descriptions
 	featureDesc := map[string]string{
 		"Validate":        "Validate existing struct (no JSON parsing)",
-		"UnmarshalMap":    "JSON → map → struct + validate",
-		"UnmarshalDirect": "json.Unmarshal + Validate (bypass, no map conversion)",
+		"UnmarshalMap":    "JSON → map → validate (Pedantigo validates and outputs struct, Huma only validates the map)",
+		"UnmarshalDirect": "json.Unmarshal + Validate (no intermediate map)",
 		"New":             "Validator creation overhead",
 		"Schema":          "JSON Schema generation",
+		"OpenAPI":         "OpenAPI-compatible schema generation",
 		"Marshal":         "Validate + JSON marshal",
 	}
 
@@ -134,7 +135,7 @@ func generateMarkdown(results []BenchmarkResult) {
 				if result != nil {
 					row += fmt.Sprintf(" %s |", formatResult(result))
 				} else {
-					row += " - |"
+					row += " unsupported |"
 				}
 			}
 			fmt.Println(row)
@@ -146,32 +147,12 @@ func generateMarkdown(results []BenchmarkResult) {
 	printSummary(results)
 }
 
+// allLibraries is the fixed list of all libraries to show in every table
+var allLibraries = []string{"Pedantigo", "Playground", "Ozzo", "Huma", "Godantic", "Godasse"}
+
 func getUniqueLibraries(results []BenchmarkResult) []string {
-	seen := make(map[string]bool)
-	var libraries []string
-	// Preferred order
-	order := []string{"Pedantigo", "Playground", "Ozzo", "Huma", "godantic", "godasse"}
-
-	for _, r := range results {
-		if !seen[r.Library] {
-			seen[r.Library] = true
-		}
-	}
-
-	// Add in preferred order
-	for _, lib := range order {
-		if seen[lib] {
-			libraries = append(libraries, lib)
-			delete(seen, lib)
-		}
-	}
-
-	// Add any remaining
-	for lib := range seen {
-		libraries = append(libraries, lib)
-	}
-
-	return libraries
+	// Always return all libraries for consistent tables
+	return allLibraries
 }
 
 func getUniqueStructs(results []BenchmarkResult) []string {
@@ -257,7 +238,8 @@ func printSummary(results []BenchmarkResult) {
 	fmt.Printf("| Library | ns/op | vs Pedantigo |\n")
 	fmt.Printf("|---------|-------|-------------|\n")
 
-	for _, lib := range []string{"Pedantigo", "Playground", "Ozzo", "Huma", "godantic", "godasse"} {
+	for _, lib := range allLibraries {
+		found := false
 		for _, r := range results {
 			if r.Library == lib && r.Feature == "Validate" && r.Struct == "Simple" {
 				ratio := r.NsPerOp / pedantigoValidateSimple.NsPerOp
@@ -270,8 +252,12 @@ func printSummary(results []BenchmarkResult) {
 					comparison = "baseline"
 				}
 				fmt.Printf("| %s | %s | %s |\n", lib, formatNs(r.NsPerOp), comparison)
+				found = true
 				break
 			}
+		}
+		if !found {
+			fmt.Printf("| %s | unsupported | unsupported |\n", lib)
 		}
 	}
 	fmt.Println()
@@ -282,12 +268,17 @@ func printSummary(results []BenchmarkResult) {
 	fmt.Printf("| Library | B/op | allocs/op |\n")
 	fmt.Printf("|---------|------|----------|\n")
 
-	for _, lib := range []string{"Pedantigo", "Playground", "Ozzo", "Huma", "godantic", "godasse"} {
+	for _, lib := range allLibraries {
+		found := false
 		for _, r := range results {
 			if r.Library == lib && r.Feature == "Validate" && r.Struct == "Simple" {
 				fmt.Printf("| %s | %d | %d |\n", lib, r.BytesOp, r.AllocsOp)
+				found = true
 				break
 			}
+		}
+		if !found {
+			fmt.Printf("| %s | unsupported | unsupported |\n", lib)
 		}
 	}
 	fmt.Println()
@@ -303,8 +294,8 @@ func printSummary(results []BenchmarkResult) {
 	fmt.Println("```")
 	fmt.Println("Benchmark_<Library>_<Feature>_<Struct>")
 	fmt.Println()
-	fmt.Println("Libraries: Pedantigo, Playground, Ozzo, Huma, godantic, godasse")
-	fmt.Println("Features: Validate, UnmarshalMap, UnmarshalDirect, New, Schema, Marshal")
+	fmt.Println("Libraries: Pedantigo, Playground, Ozzo, Huma, Godantic, Godasse")
+	fmt.Println("Features: Validate, UnmarshalMap, UnmarshalDirect, New, Schema, OpenAPI, Marshal")
 	fmt.Println("Structs: Simple (5 fields), Complex (nested), Large (20+ fields)")
 	fmt.Println("```")
 	fmt.Println("</details>")

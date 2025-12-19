@@ -2,8 +2,8 @@
 report.csv
 benchmark-output.txt
 
-# Cloned repos (CI)
-pedantigo-src/
+# Cloned repos (runtime)
+third_party/
 
 # Go
 *.exe

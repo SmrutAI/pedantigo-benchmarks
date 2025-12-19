@@ -1,6 +1,7 @@
 package benchmarks
 
 import (
+	"encoding/json"
 	"reflect"
 	"testing"
 
@@ -12,95 +13,86 @@ import (
 // ============================================================================
 
 // ----------------------------------------------------------------------------
-// Core Comparison (Apples-to-Apples with Pedantigo/Playground)
+// Validate (Skip - Huma only validates maps, not typed structs)
 // ----------------------------------------------------------------------------
 
-// Benchmark_Huma_Validate_Simple validates an existing 5-field struct
+// Benchmark_Huma_Validate_Simple - Huma cannot validate typed structs
 func Benchmark_Huma_Validate_Simple(b *testing.B) {
-	user := ValidUserHuma
-	registry := huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer)
-	schema := registry.Schema(reflect.TypeOf(user), true, "")
-	pb := huma.NewPathBuffer([]byte{}, 0)
-	res := &huma.ValidateResult{}
-
-	// warm
-	huma.Validate(registry, schema, pb, huma.ModeWriteToServer, &user, res)
-
-	b.ResetTimer()
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		res.Reset()
-		pb.Reset()
-		huma.Validate(registry, schema, pb, huma.ModeWriteToServer, &user, res)
-	}
+	b.Skip("Huma validates map[string]any from JSON, not typed structs - see UnmarshalMap benchmarks")
 }
 
-// Benchmark_Huma_Validate_Complex validates nested order struct
+// Benchmark_Huma_Validate_Complex - Huma cannot validate typed structs
 func Benchmark_Huma_Validate_Complex(b *testing.B) {
-	order := ValidOrderHuma
-	registry := huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer)
-	schema := registry.Schema(reflect.TypeOf(order), true, "")
-	pb := huma.NewPathBuffer([]byte{}, 0)
-	res := &huma.ValidateResult{}
-
-	// warm
-	huma.Validate(registry, schema, pb, huma.ModeWriteToServer, &order, res)
-
-	b.ResetTimer()
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		res.Reset()
-		pb.Reset()
-		huma.Validate(registry, schema, pb, huma.ModeWriteToServer, &order, res)
-	}
+	b.Skip("Huma validates map[string]any from JSON, not typed structs - see UnmarshalMap benchmarks")
 }
 
-// Benchmark_Huma_Validate_Large validates 20-field config struct
+// Benchmark_Huma_Validate_Large - Huma cannot validate typed structs
 func Benchmark_Huma_Validate_Large(b *testing.B) {
-	config := ValidConfigHuma
+	b.Skip("Huma validates map[string]any from JSON, not typed structs - see UnmarshalMap benchmarks")
+}
+
+// ----------------------------------------------------------------------------
+// UnmarshalMap (JSON → map → validate) - Huma's actual flow
+// ----------------------------------------------------------------------------
+
+// Benchmark_Huma_UnmarshalMap_Simple tests JSON→map→validate (Huma's real API flow)
+func Benchmark_Huma_UnmarshalMap_Simple(b *testing.B) {
 	registry := huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer)
-	schema := registry.Schema(reflect.TypeOf(config), true, "")
+	schema := registry.Schema(reflect.TypeOf(UserHuma{}), true, "")
 	pb := huma.NewPathBuffer([]byte{}, 0)
 	res := &huma.ValidateResult{}
 
 	// warm
-	huma.Validate(registry, schema, pb, huma.ModeWriteToServer, &config, res)
+	var parsed any
+	json.Unmarshal(ValidUserJSON, &parsed)
+	huma.Validate(registry, schema, pb, huma.ModeWriteToServer, parsed, res)
 
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
+		var p any
+		json.Unmarshal(ValidUserJSON, &p)
 		res.Reset()
 		pb.Reset()
-		huma.Validate(registry, schema, pb, huma.ModeWriteToServer, &config, res)
+		huma.Validate(registry, schema, pb, huma.ModeWriteToServer, p, res)
+	}
+}
+
+// Benchmark_Huma_UnmarshalMap_Complex tests JSON→map→validate for nested structs
+func Benchmark_Huma_UnmarshalMap_Complex(b *testing.B) {
+	registry := huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer)
+	schema := registry.Schema(reflect.TypeOf(OrderHuma{}), true, "")
+	pb := huma.NewPathBuffer([]byte{}, 0)
+	res := &huma.ValidateResult{}
+
+	// warm
+	var parsed any
+	json.Unmarshal(ValidOrderJSON, &parsed)
+	huma.Validate(registry, schema, pb, huma.ModeWriteToServer, parsed, res)
+
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		var p any
+		json.Unmarshal(ValidOrderJSON, &p)
+		res.Reset()
+		pb.Reset()
+		huma.Validate(registry, schema, pb, huma.ModeWriteToServer, p, res)
 	}
 }
 
 // ----------------------------------------------------------------------------
-// Pedantigo-only features (Skip)
+// UnmarshalDirect (Skip - Huma doesn't output typed structs)
 // ----------------------------------------------------------------------------
 
-// Benchmark_Huma_UnmarshalMap_Simple - Not applicable to Huma
-func Benchmark_Huma_UnmarshalMap_Simple(b *testing.B) {
-	b.Skip("UnmarshalMap is a Pedantigo-only feature")
-}
-
-// Benchmark_Huma_UnmarshalMap_Complex - Not applicable to Huma
-func Benchmark_Huma_UnmarshalMap_Complex(b *testing.B) {
-	b.Skip("UnmarshalMap is a Pedantigo-only feature")
-}
-
-// ----------------------------------------------------------------------------
-// Playground-only features (Skip)
-// ----------------------------------------------------------------------------
-
-// Benchmark_Huma_UnmarshalDirect_Simple - Not applicable to Huma
+// Benchmark_Huma_UnmarshalDirect_Simple - Huma doesn't produce typed structs
 func Benchmark_Huma_UnmarshalDirect_Simple(b *testing.B) {
-	b.Skip("UnmarshalDirect is a Playground-only pattern")
+	b.Skip("Huma validates maps, doesn't produce typed structs like Pedantigo/Playground")
 }
 
-// Benchmark_Huma_UnmarshalDirect_Complex - Not applicable to Huma
+// Benchmark_Huma_UnmarshalDirect_Complex - Huma doesn't produce typed structs
 func Benchmark_Huma_UnmarshalDirect_Complex(b *testing.B) {
-	b.Skip("UnmarshalDirect is a Playground-only pattern")
+	b.Skip("Huma validates maps, doesn't produce typed structs like Pedantigo/Playground")
 }
 
 // ----------------------------------------------------------------------------
@@ -140,6 +132,31 @@ func Benchmark_Huma_Schema_Uncached(b *testing.B) {
 
 // Benchmark_Huma_Schema_Cached - Schema reuse from registry
 func Benchmark_Huma_Schema_Cached(b *testing.B) {
+	registry := huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer)
+	_ = registry.Schema(reflect.TypeOf(UserHuma{}), true, "") // prime cache
+
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		_ = registry.Schema(reflect.TypeOf(UserHuma{}), true, "")
+	}
+}
+
+// ----------------------------------------------------------------------------
+// OpenAPI Schema Generation (Huma uses same Schema() for OpenAPI)
+// ----------------------------------------------------------------------------
+
+// Benchmark_Huma_OpenAPI_Uncached - OpenAPI schema generation (same as Schema)
+func Benchmark_Huma_OpenAPI_Uncached(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		registry := huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer)
+		_ = registry.Schema(reflect.TypeOf(UserHuma{}), true, "")
+	}
+}
+
+// Benchmark_Huma_OpenAPI_Cached - OpenAPI schema reuse from registry
+func Benchmark_Huma_OpenAPI_Cached(b *testing.B) {
 	registry := huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer)
 	_ = registry.Schema(reflect.TypeOf(UserHuma{}), true, "") // prime cache
 

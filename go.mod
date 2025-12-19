@@ -5,10 +5,10 @@ go 1.24.0
 require (
 	github.com/SmrutAI/pedantigo v0.0.0
 	github.com/danielgtaylor/huma/v2 v2.34.1
-	github.com/deepankarm/godantic v0.0.0
+	github.com/deepankarm/godantic v0.0.0-20251202064107-1b3e8415c487
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/go-playground/validator/v10 v10.27.0
-	github.com/pasqal-io/godasse v0.12.1
+	github.com/pasqal-io/godasse v0.5.2
 )
 
 require (
@@ -29,8 +29,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/SmrutAI/pedantigo => ../Pedantigo
-
-replace github.com/deepankarm/godantic => ../Pedantigo/etc/godantic
-
-replace github.com/pasqal-io/godasse => ../Pedantigo/etc/godasse
+replace github.com/SmrutAI/pedantigo => ./third_party/pedantigo

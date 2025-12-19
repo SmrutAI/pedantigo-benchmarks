@@ -1,20 +1,30 @@
 # Pedantigo Benchmarks Makefile
-# Usage: make bench      # Run full benchmarks (count=50)
-#        make bench-quick # Quick test (count=5)
+# Usage: make bench      # Run full benchmarks (count=20)
+#        make bench-quick # Quick test (count=3)
+#        make setup      # Clone pedantigo to third_party/
+#        make vendor     # Vendor dependencies
 #        make report     # Generate report from existing output
 
-PEDANTIGO_PATH ?= ../Pedantigo
-COUNT ?= 50
+COUNT ?= 20
 
-.PHONY: bench bench-quick report clean help
+.PHONY: bench bench-quick setup vendor report clean help
 
-# Run full benchmarks with count=50
-bench:
-	./scripts/run-benchmarks.sh $(COUNT) $(PEDANTIGO_PATH)
+# Setup: clone pedantigo
+setup:
+	./setup.sh
 
-# Quick test with count=5
-bench-quick:
-	./scripts/run-benchmarks.sh 5 $(PEDANTIGO_PATH)
+# Vendor dependencies (run after setup)
+vendor: setup
+	go mod vendor
+	@echo "Vendor complete. Commit vendor/ to repo."
+
+# Run full benchmarks
+bench: setup
+	./scripts/run-benchmarks.sh $(COUNT)
+
+# Quick test with count=3
+bench-quick: setup
+	./scripts/run-benchmarks.sh 3
 
 # Generate report from existing benchmark-output.txt
 report:
@@ -24,22 +34,19 @@ report:
 # Clean generated files
 clean:
 	rm -f benchmark-output.txt BENCHMARK.md
-	go mod edit -dropreplace github.com/SmrutAI/pedantigo 2>/dev/null || true
+	rm -rf third_party/
 
 # Show help
 help:
 	@echo "Pedantigo Benchmarks"
 	@echo ""
 	@echo "Usage:"
-	@echo "  make bench          Run full benchmarks (count=50)"
-	@echo "  make bench-quick    Quick test (count=5)"
+	@echo "  make setup          Clone pedantigo to third_party/"
+	@echo "  make vendor         Vendor all dependencies"
+	@echo "  make bench          Run full benchmarks (count=20)"
+	@echo "  make bench-quick    Quick test (count=3)"
 	@echo "  make report         Generate report from existing output"
 	@echo "  make clean          Remove generated files"
 	@echo ""
 	@echo "Variables:"
-	@echo "  PEDANTIGO_PATH      Path to pedantigo (default: ../Pedantigo)"
-	@echo "  COUNT               Benchmark iterations (default: 50)"
-	@echo ""
-	@echo "Examples:"
-	@echo "  make bench COUNT=10"
-	@echo "  make bench PEDANTIGO_PATH=/path/to/pedantigo"
+	@echo "  COUNT               Benchmark iterations (default: 20)"
