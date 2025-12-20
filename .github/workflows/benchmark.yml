@@ -8,7 +8,7 @@ on:
   workflow_dispatch:  # Manual trigger
 
 concurrency:
-  group: benchmark-main
+  group: benchmark-repo-wide
   cancel-in-progress: false
 
 permissions:
@@ -46,8 +46,9 @@ jobs:
           git add BENCHMARK.md
           git diff --staged --quiet || git commit -m "chore: update benchmark report"
 
-          # Force push - latest benchmark always wins
-          git push --force-with-lease
+          # Pull latest and rebase before pushing (handles concurrent runs)
+          git pull --rebase origin main
+          git push
 
       - name: Trigger docs rebuild
         uses: peter-evans/repository-dispatch@v3
