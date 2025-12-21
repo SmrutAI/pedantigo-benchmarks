@@ -32,13 +32,13 @@ func Benchmark_Godasse_Validate_Large(b *testing.B) {
 }
 
 // ----------------------------------------------------------------------------
-// godasse Unmarshal + Validate (comparable to Pedantigo UnmarshalMap)
+// JSONValidate (JSON -> map -> struct + validate)
 // ----------------------------------------------------------------------------
 
-// Benchmark_Godasse_UnmarshalMap_Simple - JSON -> map -> struct + validate
+// Benchmark_Godasse_JSONValidate_Simple - JSON -> map -> struct + validate
 // NOTE: JSON parsing is included in the timer for fair comparison with Pedantigo,
 // which also parses JSON inside its Unmarshal function.
-func Benchmark_Godasse_UnmarshalMap_Simple(b *testing.B) {
+func Benchmark_Godasse_JSONValidate_Simple(b *testing.B) {
 	deserializer, err := deserialize.MakeMapDeserializer[UserGodasse](deserialize.Options{
 		Unmarshaler: jsonPkg.Driver,
 		MainTagName: "json",
@@ -64,10 +64,10 @@ func Benchmark_Godasse_UnmarshalMap_Simple(b *testing.B) {
 	}
 }
 
-// Benchmark_Godasse_UnmarshalMap_Complex - JSON -> map -> struct + validate
+// Benchmark_Godasse_JSONValidate_Complex - JSON -> map -> struct + validate
 // NOTE: JSON parsing is included in the timer for fair comparison with Pedantigo,
 // which also parses JSON inside its Unmarshal function.
-func Benchmark_Godasse_UnmarshalMap_Complex(b *testing.B) {
+func Benchmark_Godasse_JSONValidate_Complex(b *testing.B) {
 	deserializer, err := deserialize.MakeMapDeserializer[OrderGodasse](deserialize.Options{
 		Unmarshaler: jsonPkg.Driver,
 		MainTagName: "json",
@@ -91,20 +91,6 @@ func Benchmark_Godasse_UnmarshalMap_Complex(b *testing.B) {
 		_ = json.Unmarshal(jsonData, &dict)
 		_, _ = deserializer.DeserializeDict(dict)
 	}
-}
-
-// ----------------------------------------------------------------------------
-// Playground-only features (Skip)
-// ----------------------------------------------------------------------------
-
-// Benchmark_Godasse_UnmarshalDirect_Simple - Not applicable to godasse
-func Benchmark_Godasse_UnmarshalDirect_Simple(b *testing.B) {
-	b.Skip("UnmarshalDirect is a Playground-only pattern")
-}
-
-// Benchmark_Godasse_UnmarshalDirect_Complex - Not applicable to godasse
-func Benchmark_Godasse_UnmarshalDirect_Complex(b *testing.B) {
-	b.Skip("UnmarshalDirect is a Playground-only pattern")
 }
 
 // ----------------------------------------------------------------------------

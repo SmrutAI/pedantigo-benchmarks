@@ -32,13 +32,13 @@ func Benchmark_Huma_Validate_Large(b *testing.B) {
 }
 
 // ----------------------------------------------------------------------------
-// UnmarshalMap (JSON → map → validate) - Huma's actual flow
+// JSONValidate (JSON → map → validate) - Huma's actual flow
 // ----------------------------------------------------------------------------
 
-// Benchmark_Huma_UnmarshalMap_Simple tests JSON→map→validate (Huma's real API flow)
+// Benchmark_Huma_JSONValidate_Simple tests JSON→map→validate (Huma's real API flow)
 // NOTE: Huma only validates the map - it does NOT convert to a typed struct.
 // This is less work than Pedantigo which parses JSON, validates, AND outputs a typed struct.
-func Benchmark_Huma_UnmarshalMap_Simple(b *testing.B) {
+func Benchmark_Huma_JSONValidate_Simple(b *testing.B) {
 	registry := huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer)
 	schema := registry.Schema(reflect.TypeOf(UserHuma{}), true, "")
 	pb := huma.NewPathBuffer([]byte{}, 0)
@@ -60,10 +60,10 @@ func Benchmark_Huma_UnmarshalMap_Simple(b *testing.B) {
 	}
 }
 
-// Benchmark_Huma_UnmarshalMap_Complex tests JSON→map→validate for nested structs
+// Benchmark_Huma_JSONValidate_Complex tests JSON→map→validate for nested structs
 // NOTE: Huma only validates the map - it does NOT convert to a typed struct.
 // This is less work than Pedantigo which parses JSON, validates, AND outputs a typed struct.
-func Benchmark_Huma_UnmarshalMap_Complex(b *testing.B) {
+func Benchmark_Huma_JSONValidate_Complex(b *testing.B) {
 	registry := huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer)
 	schema := registry.Schema(reflect.TypeOf(OrderHuma{}), true, "")
 	pb := huma.NewPathBuffer([]byte{}, 0)
@@ -83,20 +83,6 @@ func Benchmark_Huma_UnmarshalMap_Complex(b *testing.B) {
 		pb.Reset()
 		huma.Validate(registry, schema, pb, huma.ModeWriteToServer, p, res)
 	}
-}
-
-// ----------------------------------------------------------------------------
-// UnmarshalDirect (Skip - Huma doesn't output typed structs)
-// ----------------------------------------------------------------------------
-
-// Benchmark_Huma_UnmarshalDirect_Simple - Huma doesn't produce typed structs
-func Benchmark_Huma_UnmarshalDirect_Simple(b *testing.B) {
-	b.Skip("Huma validates maps, doesn't produce typed structs like Pedantigo/Playground")
-}
-
-// Benchmark_Huma_UnmarshalDirect_Complex - Huma doesn't produce typed structs
-func Benchmark_Huma_UnmarshalDirect_Complex(b *testing.B) {
-	b.Skip("Huma validates maps, doesn't produce typed structs like Pedantigo/Playground")
 }
 
 // ----------------------------------------------------------------------------

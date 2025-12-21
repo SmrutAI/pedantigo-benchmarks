@@ -83,13 +83,12 @@ func generatePRReport(results []BenchmarkResult) {
 
 	// Feature descriptions (short)
 	featureDesc := map[string]string{
-		"Validate":        "Validate struct",
-		"UnmarshalMap":    "JSON → struct + validate",
-		"UnmarshalDirect": "Unmarshal + validate",
-		"New":             "Validator creation",
-		"Schema":          "Schema generation",
-		"OpenAPI":         "OpenAPI schema",
-		"Marshal":         "Validate + marshal",
+		"Validate":     "Validate struct",
+		"JSONValidate": "JSON validate",
+		"New":          "Validator creation",
+		"Schema":       "Schema generation",
+		"OpenAPI":      "OpenAPI schema",
+		"Marshal":      "Validate + marshal",
 	}
 
 	for _, feature := range features {

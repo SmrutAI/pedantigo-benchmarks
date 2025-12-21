@@ -92,19 +92,20 @@ func generateMarkdown(results []BenchmarkResult) {
 	fmt.Println()
 	fmt.Printf("Generated: %s\n", time.Now().UTC().Format("2006-01-02 15:04:05 UTC"))
 	fmt.Println()
+	fmt.Println("If you're interested in diving deeper, check out our [benchmark repository](https://github.com/smrutAI/pedantigo-benchmarks).")
+	fmt.Println()
 
 	// Print library notes
 	printLibraryNotes()
 
 	// Feature descriptions
 	featureDesc := map[string]string{
-		"Validate":        "Validate existing struct (no JSON parsing)",
-		"UnmarshalMap":    "JSON → map → validate (Pedantigo validates and outputs struct, Huma only validates the map)",
-		"UnmarshalDirect": "json.Unmarshal + Validate (no intermediate map)",
-		"New":             "Validator creation overhead",
-		"Schema":          "JSON Schema generation",
-		"OpenAPI":         "OpenAPI-compatible schema generation",
-		"Marshal":         "Validate + JSON marshal",
+		"Validate":     "Validate existing struct (no JSON parsing)",
+		"JSONValidate": "JSON bytes → struct + validate",
+		"New":          "Validator creation overhead",
+		"Schema":       "JSON Schema generation",
+		"OpenAPI":      "OpenAPI-compatible schema generation",
+		"Marshal":      "Validate + JSON marshal",
 	}
 
 	for _, feature := range features {
@@ -264,8 +265,8 @@ func printSummary(results []BenchmarkResult) {
 	}{
 		{"Validate", "Simple", "Validate_Simple (struct validation)"},
 		{"Validate", "Complex", "Validate_Complex (nested structs)"},
-		{"UnmarshalMap", "Simple", "UnmarshalMap_Simple (JSON → struct + validate)"},
-		{"UnmarshalMap", "Complex", "UnmarshalMap_Complex (nested JSON)"},
+		{"JSONValidate", "Simple", "JSONValidate_Simple (JSON → struct + validate)"},
+		{"JSONValidate", "Complex", "JSONValidate_Complex (nested JSON)"},
 		{"Schema", "Uncached", "Schema_Uncached (first-time generation)"},
 		{"Schema", "Cached", "Schema_Cached (cached lookup)"},
 	}
@@ -333,7 +334,7 @@ func printLegend() {
 	fmt.Println("Benchmark_<Library>_<Feature>_<Struct>")
 	fmt.Println()
 	fmt.Println("Libraries: Pedantigo, Playground, Ozzo, Huma, Godantic, Godasse")
-	fmt.Println("Features: Validate, UnmarshalMap, UnmarshalDirect, New, Schema, OpenAPI, Marshal")
+	fmt.Println("Features: Validate, JSONValidate, New, Schema, OpenAPI, Marshal")
 	fmt.Println("Structs: Simple (5 fields), Complex (nested), Large (20+ fields)")
 	fmt.Println("```")
 	fmt.Println("</details>")

@@ -52,25 +52,11 @@ func Benchmark_Playground_Validate_Large(b *testing.B) {
 }
 
 // ----------------------------------------------------------------------------
-// Pedantigo-only features (Skip)
+// JSONValidate (json.Unmarshal + Struct)
 // ----------------------------------------------------------------------------
 
-// Benchmark_Playground_UnmarshalMap_Simple - Not applicable to Playground
-func Benchmark_Playground_UnmarshalMap_Simple(b *testing.B) {
-	b.Skip("UnmarshalMap is a Pedantigo-only feature (JSON→map→struct)")
-}
-
-// Benchmark_Playground_UnmarshalMap_Complex - Not applicable to Playground
-func Benchmark_Playground_UnmarshalMap_Complex(b *testing.B) {
-	b.Skip("UnmarshalMap is a Pedantigo-only feature (JSON→map→struct)")
-}
-
-// ----------------------------------------------------------------------------
-// Playground Unique: UnmarshalDirect (json.Unmarshal + Struct)
-// ----------------------------------------------------------------------------
-
-// Benchmark_Playground_UnmarshalDirect_Simple tests stdlib json.Unmarshal + Struct
-func Benchmark_Playground_UnmarshalDirect_Simple(b *testing.B) {
+// Benchmark_Playground_JSONValidate_Simple tests stdlib json.Unmarshal + Struct
+func Benchmark_Playground_JSONValidate_Simple(b *testing.B) {
 	var user UserPlayground
 	_ = json.Unmarshal(ValidUserJSON, &user)
 	_ = playgroundValidator.Struct(user)
@@ -84,8 +70,8 @@ func Benchmark_Playground_UnmarshalDirect_Simple(b *testing.B) {
 	}
 }
 
-// Benchmark_Playground_UnmarshalDirect_Complex tests stdlib json.Unmarshal + Struct for nested
-func Benchmark_Playground_UnmarshalDirect_Complex(b *testing.B) {
+// Benchmark_Playground_JSONValidate_Complex tests stdlib json.Unmarshal + Struct for nested
+func Benchmark_Playground_JSONValidate_Complex(b *testing.B) {
 	var order OrderPlayground
 	_ = json.Unmarshal(ValidOrderJSON, &order)
 	_ = playgroundValidator.Struct(order)

@@ -49,35 +49,11 @@ func Benchmark_Pedantigo_Validate_Large(b *testing.B) {
 }
 
 // ----------------------------------------------------------------------------
-// Pedantigo Unique: UnmarshalMap (JSON → map → struct + validate)
+// JSONValidate (json.Unmarshal + Validate)
 // ----------------------------------------------------------------------------
 
-// Benchmark_Pedantigo_UnmarshalMap_Simple tests Pedantigo's unique JSON→map→struct flow
-func Benchmark_Pedantigo_UnmarshalMap_Simple(b *testing.B) {
-	_, _ = pedantigo.Unmarshal[UserPedantigo](ValidUserJSON) // warm cache
-	b.ResetTimer()
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		_, _ = pedantigo.Unmarshal[UserPedantigo](ValidUserJSON)
-	}
-}
-
-// Benchmark_Pedantigo_UnmarshalMap_Complex tests Pedantigo's unique JSON→map→nested flow
-func Benchmark_Pedantigo_UnmarshalMap_Complex(b *testing.B) {
-	_, _ = pedantigo.Unmarshal[OrderPedantigo](ValidOrderJSON) // warm cache
-	b.ResetTimer()
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		_, _ = pedantigo.Unmarshal[OrderPedantigo](ValidOrderJSON)
-	}
-}
-
-// ----------------------------------------------------------------------------
-// UnmarshalDirect (json.Unmarshal + Validate)
-// ----------------------------------------------------------------------------
-
-// Benchmark_Pedantigo_UnmarshalDirect_Simple tests stdlib json.Unmarshal + Validate
-func Benchmark_Pedantigo_UnmarshalDirect_Simple(b *testing.B) {
+// Benchmark_Pedantigo_JSONValidate_Simple tests stdlib json.Unmarshal + Validate
+func Benchmark_Pedantigo_JSONValidate_Simple(b *testing.B) {
 	var user UserPedantigo
 	_ = json.Unmarshal(ValidUserJSON, &user)
 	_ = pedantigo.Validate(&user)
@@ -91,8 +67,8 @@ func Benchmark_Pedantigo_UnmarshalDirect_Simple(b *testing.B) {
 	}
 }
 
-// Benchmark_Pedantigo_UnmarshalDirect_Complex tests stdlib json.Unmarshal + Validate for nested
-func Benchmark_Pedantigo_UnmarshalDirect_Complex(b *testing.B) {
+// Benchmark_Pedantigo_JSONValidate_Complex tests stdlib json.Unmarshal + Validate for nested
+func Benchmark_Pedantigo_JSONValidate_Complex(b *testing.B) {
 	var order OrderPedantigo
 	_ = json.Unmarshal(ValidOrderJSON, &order)
 	_ = pedantigo.Validate(&order)
