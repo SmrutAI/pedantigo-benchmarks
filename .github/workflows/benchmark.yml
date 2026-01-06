@@ -40,6 +40,7 @@ jobs:
             benchmark-output.txt
 
       - name: Commit report
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -47,10 +48,38 @@ jobs:
           git diff --staged --quiet || git commit -m "chore: update benchmark report"
 
           # Pull latest and rebase before pushing (handles concurrent runs)
-          git pull --rebase origin main
+          if ! git pull --rebase origin main; then
+            echo "conflict=true" >> $GITHUB_OUTPUT
+            exit 1
+          fi
           git push
 
+      - name: Retry on conflict
+        if: failure() && steps.commit.outputs.conflict == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.DOCS_TRIGGER_TOKEN }}
+          VERSION: ${{ github.event.client_payload.version }}
+          REPO: ${{ github.repository }}
+          RETRY_COUNT: ${{ github.event.client_payload.retry_count || '0' }}
+        run: |
+          NEXT_RETRY=$((RETRY_COUNT + 1))
+          if [ "$NEXT_RETRY" -gt 3 ]; then
+            echo "Max retries (3) reached. Giving up."
+            exit 1
+          fi
+          echo "Conflict detected, re-triggering workflow (retry $NEXT_RETRY/3)..."
+          if [ -n "$VERSION" ]; then
+            jq -n --arg v "$VERSION" --argjson r "$NEXT_RETRY" \
+              '{event_type: "pedantigo-updated", client_payload: {version: $v, retry_count: $r}}' | \
+              gh api "repos/$REPO/dispatches" --method POST --input -
+          else
+            jq -n --argjson r "$NEXT_RETRY" \
+              '{event_type: "pedantigo-updated", client_payload: {retry_count: $r}}' | \
+              gh api "repos/$REPO/dispatches" --method POST --input -
+          fi
+
       - name: Trigger docs rebuild
+        if: success()
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.DOCS_TRIGGER_TOKEN }}
