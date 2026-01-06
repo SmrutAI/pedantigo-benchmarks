@@ -5,7 +5,7 @@ title: Benchmarks
 
 # Benchmark Results
 
-Generated: 2026-01-05 20:16:31 UTC
+Generated: 2026-01-06 11:43:04 UTC
 
 If you're interested in diving deeper, check out our [benchmark repository](https://github.com/smrutAI/pedantigo-benchmarks).
 
@@ -44,48 +44,48 @@ _JSON bytes → struct + validate_
 
 | Struct | Pedantigo | Playground | Ozzo | Huma | Godantic | Godasse |
 |--------|--------|--------|--------|--------|--------|--------|
-| Simple | 3.47 µs (19 allocs) | 4.28 µs (16 allocs) | unsupported | 3.52 µs (26 allocs) | unsupported | 5.42 µs (46 allocs) |
-| Complex | 9.84 µs (39 allocs) | 11.06 µs (33 allocs) | unsupported | 10.30 µs (78 allocs) | unsupported | 17.24 µs (153 allocs) |
+| Simple | 3.43 µs (19 allocs) | 4.25 µs (16 allocs) | unsupported | 3.52 µs (26 allocs) | unsupported | 5.38 µs (46 allocs) |
+| Complex | 9.75 µs (39 allocs) | 11.17 µs (33 allocs) | unsupported | 10.39 µs (78 allocs) | unsupported | 17.26 µs (153 allocs) |
 
 ## Marshal
 _Validate + JSON marshal_
 
 | Struct | Pedantigo | Playground | Ozzo | Huma | Godantic | Godasse |
 |--------|--------|--------|--------|--------|--------|--------|
-| Simple | 1.89 µs (11 allocs) | 2.71 µs (9 allocs) | unsupported | unsupported | unsupported | unsupported |
+| Simple | 1.88 µs (11 allocs) | 2.69 µs (9 allocs) | unsupported | unsupported | unsupported | unsupported |
 
 ## New
 _Validator creation overhead_
 
 | Struct | Pedantigo | Playground | Ozzo | Huma | Godantic | Godasse |
 |--------|--------|--------|--------|--------|--------|--------|
-| Simple | 11.73 µs (110 allocs) | 16.86 µs (187 allocs) | unsupported | 29.97 µs (255 allocs) | 27.07 µs (305 allocs) | 6.68 µs (72 allocs) |
-| Complex | 28.52 µs (270 allocs) | unsupported | unsupported | 73.56 µs (515 allocs) | 7.50 µs (75 allocs) | 23.25 µs (243 allocs) |
+| Simple | 11.74 µs (110 allocs) | 16.28 µs (187 allocs) | unsupported | 29.99 µs (255 allocs) | 26.64 µs (305 allocs) | 6.63 µs (72 allocs) |
+| Complex | 28.21 µs (270 allocs) | unsupported | unsupported | 73.97 µs (515 allocs) | 7.49 µs (75 allocs) | 23.28 µs (243 allocs) |
 
 ## OpenAPI
 _OpenAPI-compatible schema generation_
 
 | Struct | Pedantigo | Playground | Ozzo | Huma | Godantic | Godasse |
 |--------|--------|--------|--------|--------|--------|--------|
-| Uncached | 23.51 µs (204 allocs) | unsupported | unsupported | 30.27 µs (255 allocs) | unsupported | unsupported |
-| Cached | 18 ns (0 allocs) | unsupported | unsupported | 646 ns (6 allocs) | unsupported | unsupported |
+| Uncached | 23.43 µs (204 allocs) | unsupported | unsupported | 30.39 µs (255 allocs) | unsupported | unsupported |
+| Cached | 20 ns (0 allocs) | unsupported | unsupported | 638 ns (6 allocs) | unsupported | unsupported |
 
 ## Schema
 _JSON Schema generation_
 
 | Struct | Pedantigo | Playground | Ozzo | Huma | Godantic | Godasse |
 |--------|--------|--------|--------|--------|--------|--------|
-| Uncached | 22.64 µs (202 allocs) | unsupported | unsupported | 30.00 µs (255 allocs) | unsupported | unsupported |
-| Cached | 18 ns (0 allocs) | unsupported | unsupported | 634 ns (6 allocs) | unsupported | unsupported |
+| Uncached | 22.71 µs (202 allocs) | unsupported | unsupported | 30.40 µs (255 allocs) | unsupported | unsupported |
+| Cached | 20 ns (0 allocs) | unsupported | unsupported | 634 ns (6 allocs) | unsupported | unsupported |
 
 ## Validate
 _Validate existing struct (no JSON parsing)_
 
 | Struct | Pedantigo | Playground | Ozzo | Huma | Godantic | Godasse |
 |--------|--------|--------|--------|--------|--------|--------|
-| Simple | 1.43 µs (10 allocs) | 2.16 µs (7 allocs) | 12.70 µs (43 allocs) | unsupported | 5.96 µs (48 allocs) | unsupported |
-| Complex | 2.24 µs (15 allocs) | 3.46 µs (9 allocs) | 12.32 µs (139 allocs) | unsupported | 13.75 µs (120 allocs) | unsupported |
-| Large | 1.56 µs (22 allocs) | 1.85 µs (3 allocs) | 46.57 µs (254 allocs) | unsupported | 14.56 µs (126 allocs) | unsupported |
+| Simple | 1.43 µs (10 allocs) | 2.17 µs (7 allocs) | 12.81 µs (43 allocs) | unsupported | 6.03 µs (48 allocs) | unsupported |
+| Complex | 2.23 µs (15 allocs) | 3.46 µs (9 allocs) | 12.24 µs (139 allocs) | unsupported | 13.85 µs (120 allocs) | unsupported |
+| Large | 1.56 µs (22 allocs) | 1.87 µs (3 allocs) | 46.80 µs (254 allocs) | unsupported | 14.55 µs (126 allocs) | unsupported |
 
 ---
 
@@ -96,53 +96,53 @@ _Validate existing struct (no JSON parsing)_
 | Library | ns/op | allocs | vs Pedantigo |
 |---------|-------|--------|-------------|
 | Pedantigo | 1.43 µs | 10 | baseline |
-| Playground | 2.16 µs | 7 | 1.52x slower |
-| Ozzo | 12.70 µs | 43 | 8.90x slower |
+| Playground | 2.17 µs | 7 | 1.52x slower |
+| Ozzo | 12.81 µs | 43 | 8.97x slower |
 | Huma | - | - | - |
-| Godantic | 5.96 µs | 48 | 4.18x slower |
+| Godantic | 6.03 µs | 48 | 4.22x slower |
 | Godasse | - | - | - |
 
 ### Validate_Complex (nested structs)
 
 | Library | ns/op | allocs | vs Pedantigo |
 |---------|-------|--------|-------------|
-| Pedantigo | 2.24 µs | 15 | baseline |
+| Pedantigo | 2.23 µs | 15 | baseline |
 | Playground | 3.46 µs | 9 | 1.55x slower |
-| Ozzo | 12.32 µs | 139 | 5.51x slower |
+| Ozzo | 12.24 µs | 139 | 5.48x slower |
 | Huma | - | - | - |
-| Godantic | 13.75 µs | 120 | 6.15x slower |
+| Godantic | 13.85 µs | 120 | 6.20x slower |
 | Godasse | - | - | - |
 
 ### JSONValidate_Simple (JSON → struct + validate)
 
 | Library | ns/op | allocs | vs Pedantigo |
 |---------|-------|--------|-------------|
-| Pedantigo | 3.47 µs | 19 | baseline |
-| Playground | 4.28 µs | 16 | 1.23x slower |
+| Pedantigo | 3.43 µs | 19 | baseline |
+| Playground | 4.25 µs | 16 | 1.24x slower |
 | Ozzo | - | - | - |
-| Huma | 3.52 µs | 26 | 1.01x slower |
+| Huma | 3.52 µs | 26 | 1.03x slower |
 | Godantic | - | - | - |
-| Godasse | 5.42 µs | 46 | 1.56x slower |
+| Godasse | 5.38 µs | 46 | 1.57x slower |
 
 ### JSONValidate_Complex (nested JSON)
 
 | Library | ns/op | allocs | vs Pedantigo |
 |---------|-------|--------|-------------|
-| Pedantigo | 9.84 µs | 39 | baseline |
-| Playground | 11.06 µs | 33 | 1.12x slower |
+| Pedantigo | 9.75 µs | 39 | baseline |
+| Playground | 11.17 µs | 33 | 1.15x slower |
 | Ozzo | - | - | - |
-| Huma | 10.30 µs | 78 | 1.05x slower |
+| Huma | 10.39 µs | 78 | 1.07x slower |
 | Godantic | - | - | - |
-| Godasse | 17.24 µs | 153 | 1.75x slower |
+| Godasse | 17.26 µs | 153 | 1.77x slower |
 
 ### Schema_Uncached (first-time generation)
 
 | Library | ns/op | allocs | vs Pedantigo |
 |---------|-------|--------|-------------|
-| Pedantigo | 22.64 µs | 202 | baseline |
+| Pedantigo | 22.71 µs | 202 | baseline |
 | Playground | - | - | - |
 | Ozzo | - | - | - |
-| Huma | 30.00 µs | 255 | 1.32x slower |
+| Huma | 30.40 µs | 255 | 1.34x slower |
 | Godantic | - | - | - |
 | Godasse | - | - | - |
 
@@ -150,10 +150,10 @@ _Validate existing struct (no JSON parsing)_
 
 | Library | ns/op | allocs | vs Pedantigo |
 |---------|-------|--------|-------------|
-| Pedantigo | 18 ns | 0 | baseline |
+| Pedantigo | 20 ns | 0 | baseline |
 | Playground | - | - | - |
 | Ozzo | - | - | - |
-| Huma | 634 ns | 6 | 34.61x slower |
+| Huma | 634 ns | 6 | 31.33x slower |
 | Godantic | - | - | - |
 | Godasse | - | - | - |
 
