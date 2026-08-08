@@ -73,12 +73,10 @@ func generateMarkdown(results []BenchmarkResult) {
 		byFeature[r.Feature] = append(byFeature[r.Feature], r)
 	}
 
-	// Get sorted list of features
-	features := make([]string, 0, len(byFeature))
-	for f := range byFeature {
-		features = append(features, f)
-	}
-	sort.Strings(features)
+	// Get ordered list of features. Unmarshal must sit immediately after
+	// Marshal (single-call decode+validate is the natural counterpart to
+	// validate+encode), not wherever plain alphabetical sort would place it.
+	features := orderedFeatures(byFeature)
 
 	// Print Docusaurus frontmatter (required for docs site)
 	fmt.Println("---")
@@ -98,10 +96,14 @@ func generateMarkdown(results []BenchmarkResult) {
 	// Print library notes
 	printLibraryNotes()
 
+	// Explain why New() is expensive and how to amortize it
+	printUsageRecommendation()
+
 	// Feature descriptions
 	featureDesc := map[string]string{
 		"Validate":     "Validate existing struct (no JSON parsing)",
-		"JSONValidate": "JSON bytes → struct + validate",
+		"JSONValidate": "JSON bytes → struct, then a separate validate step",
+		"Unmarshal":    "JSON bytes → validated struct in a single call",
 		"New":          "Validator creation overhead",
 		"Schema":       "JSON Schema generation",
 		"OpenAPI":      "OpenAPI-compatible schema generation",
@@ -156,6 +158,34 @@ func generateMarkdown(results []BenchmarkResult) {
 
 	// Print summary
 	printSummary(results)
+}
+
+// orderedFeatures returns feature names in a fixed reading order rather than
+// plain alphabetical sort, so Unmarshal (single-call decode+validate) sits
+// immediately after Marshal (validate+encode) instead of wherever alphabetical
+// order would otherwise place it. Any feature not in the preferred list
+// (e.g. a future addition) is appended alphabetically at the end.
+func orderedFeatures(byFeature map[string][]BenchmarkResult) []string {
+	preferred := []string{"Validate", "JSONValidate", "Marshal", "Unmarshal", "New", "Schema", "OpenAPI"}
+
+	seen := make(map[string]bool, len(byFeature))
+	features := make([]string, 0, len(byFeature))
+	for _, f := range preferred {
+		if _, ok := byFeature[f]; ok {
+			features = append(features, f)
+			seen[f] = true
+		}
+	}
+
+	var leftover []string
+	for f := range byFeature {
+		if !seen[f] {
+			leftover = append(leftover, f)
+		}
+	}
+	sort.Strings(leftover)
+
+	return append(features, leftover...)
 }
 
 // allLibraries is the fixed list of all libraries to show in every table
@@ -218,6 +248,51 @@ func formatNs(ns float64) string {
 	return fmt.Sprintf("%.0f ns", ns)
 }
 
+// printUsageRecommendation explains why New()/deserializer construction is
+// expensive (see the New section below) and how to amortize that cost, so the
+// New numbers aren't misread as "this is how fast every call is."
+func printUsageRecommendation() {
+	fmt.Println("## Getting the Best Performance")
+	fmt.Println()
+	fmt.Println("`New[T]()` does the expensive work once: it walks the struct via reflection, " +
+		"resolves every constraint tag, and builds an internal field-constraint cache " +
+		"(plus the JSON field deserializers). That one-time cost is what the `New` section " +
+		"below measures (microsecond range). Every other operation - `Validate`, `Unmarshal`, " +
+		"`Marshal`, `Schema` - reuses that precomputed cache and runs in the hundreds-of-ns to " +
+		"low-µs range, which is why those numbers consistently beat libraries that re-resolve " +
+		"constraints or re-walk structs on every call.")
+	fmt.Println()
+	fmt.Println("This only pays off if the `*Validator[T]` returned by `New` is built once and " +
+		"reused - not recreated per request. Two ways to do that:")
+	fmt.Println()
+	fmt.Println("**Module-level variable** (sufficient to call the validator directly):")
+	fmt.Println()
+	fmt.Println("```go")
+	fmt.Println("var userValidator = validator.New[User]()")
+	fmt.Println()
+	fmt.Println("func handleCreateUser(body []byte) (*User, error) {")
+	fmt.Println("\treturn userValidator.Unmarshal(body) // reuses the cached field constraints")
+	fmt.Println("}")
+	fmt.Println("```")
+	fmt.Println()
+	fmt.Println("**`Register`** (needed in addition, only if a framework integration - e.g. the " +
+		"Echo Binder plugin, or `UnmarshalInto` - must find the validator for a type it only " +
+		"knows via `reflect.Type` at runtime, not through your module-level variable):")
+	fmt.Println()
+	fmt.Println("```go")
+	fmt.Println("var _ = validator.Register(validator.New[User]())")
+	fmt.Println("```")
+	fmt.Println()
+	fmt.Println("`Register[T]` may be called exactly once per type - a second call for the same " +
+		"type panics, by design. A type could have multiple differently-configured validators " +
+		"(different `Options`), and pedantigo has no way to guess which one a framework plugin " +
+		"should resolve to, so it refuses to silently pick one. Call `Register` from exactly one " +
+		"package-level `var` declaration per type.")
+	fmt.Println()
+	fmt.Println("---")
+	fmt.Println()
+}
+
 func printLibraryNotes() {
 	fmt.Println("## Library Notes")
 	fmt.Println()
@@ -265,8 +340,10 @@ func printSummary(results []BenchmarkResult) {
 	}{
 		{"Validate", "Simple", "Validate_Simple (struct validation)"},
 		{"Validate", "Complex", "Validate_Complex (nested structs)"},
-		{"JSONValidate", "Simple", "JSONValidate_Simple (JSON → struct + validate)"},
+		{"JSONValidate", "Simple", "JSONValidate_Simple (JSON → struct, then validate)"},
 		{"JSONValidate", "Complex", "JSONValidate_Complex (nested JSON)"},
+		{"Unmarshal", "Simple", "Unmarshal_Simple (JSON → validated struct, single call)"},
+		{"Unmarshal", "Complex", "Unmarshal_Complex (nested JSON, single call)"},
 		{"Schema", "Uncached", "Schema_Uncached (first-time generation)"},
 		{"Schema", "Cached", "Schema_Cached (cached lookup)"},
 	}
@@ -334,7 +411,7 @@ func printLegend() {
 	fmt.Println("Benchmark_<Library>_<Feature>_<Struct>")
 	fmt.Println()
 	fmt.Println("Libraries: Pedantigo, Playground, Ozzo, Huma, Godantic, Godasse")
-	fmt.Println("Features: Validate, JSONValidate, New, Schema, OpenAPI, Marshal")
+	fmt.Println("Features: Validate, JSONValidate, Marshal, Unmarshal, New, Schema, OpenAPI")
 	fmt.Println("Structs: Simple (5 fields), Complex (nested), Large (20+ fields)")
 	fmt.Println("```")
 	fmt.Println("</details>")

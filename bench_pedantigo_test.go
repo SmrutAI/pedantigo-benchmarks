@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/SmrutAI/pedantigo"
+	"github.com/SmrutAI/pedantigo/v2/validator"
 )
 
 // ============================================================================
@@ -18,33 +18,33 @@ import (
 // Benchmark_Pedantigo_Validate_Simple validates an existing 5-field struct (bypass)
 func Benchmark_Pedantigo_Validate_Simple(b *testing.B) {
 	user := ValidUserPedantigo
-	_ = pedantigo.Validate(&user) // warm cache
+	_ = validator.Validate(&user) // warm cache
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		_ = pedantigo.Validate(&user)
+		_ = validator.Validate(&user)
 	}
 }
 
 // Benchmark_Pedantigo_Validate_Complex validates an existing nested struct (bypass)
 func Benchmark_Pedantigo_Validate_Complex(b *testing.B) {
 	order := ValidOrderPedantigo
-	_ = pedantigo.Validate(&order) // warm cache
+	_ = validator.Validate(&order) // warm cache
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		_ = pedantigo.Validate(&order)
+		_ = validator.Validate(&order)
 	}
 }
 
 // Benchmark_Pedantigo_Validate_Large validates an existing 20+ field struct (bypass)
 func Benchmark_Pedantigo_Validate_Large(b *testing.B) {
 	config := ValidConfigPedantigo
-	_ = pedantigo.Validate(&config) // warm cache
+	_ = validator.Validate(&config) // warm cache
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		_ = pedantigo.Validate(&config)
+		_ = validator.Validate(&config)
 	}
 }
 
@@ -56,14 +56,14 @@ func Benchmark_Pedantigo_Validate_Large(b *testing.B) {
 func Benchmark_Pedantigo_JSONValidate_Simple(b *testing.B) {
 	var user UserPedantigo
 	_ = json.Unmarshal(ValidUserJSON, &user)
-	_ = pedantigo.Validate(&user)
+	_ = validator.Validate(&user)
 
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		var u UserPedantigo
 		_ = json.Unmarshal(ValidUserJSON, &u)
-		_ = pedantigo.Validate(&u)
+		_ = validator.Validate(&u)
 	}
 }
 
@@ -71,14 +71,50 @@ func Benchmark_Pedantigo_JSONValidate_Simple(b *testing.B) {
 func Benchmark_Pedantigo_JSONValidate_Complex(b *testing.B) {
 	var order OrderPedantigo
 	_ = json.Unmarshal(ValidOrderJSON, &order)
-	_ = pedantigo.Validate(&order)
+	_ = validator.Validate(&order)
 
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		var o OrderPedantigo
 		_ = json.Unmarshal(ValidOrderJSON, &o)
-		_ = pedantigo.Validate(&o)
+		_ = validator.Validate(&o)
+	}
+}
+
+// ----------------------------------------------------------------------------
+// Unmarshal (single-call JSON decode + defaults + validate)
+// ----------------------------------------------------------------------------
+
+// Benchmark_Pedantigo_Unmarshal_Simple tests pedantigo's own Unmarshal: JSON
+// bytes decoded, defaults applied, and validated in one call (unlike
+// Benchmark_Pedantigo_JSONValidate_Simple, which uses stdlib json.Unmarshal
+// followed by a separate Validate call).
+func Benchmark_Pedantigo_Unmarshal_Simple(b *testing.B) {
+	if _, err := validator.Unmarshal[UserPedantigo](ValidUserJSON); err != nil { // warm cache
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		if _, err := validator.Unmarshal[UserPedantigo](ValidUserJSON); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// Benchmark_Pedantigo_Unmarshal_Complex tests pedantigo's own Unmarshal for a
+// nested struct: JSON bytes decoded, defaults applied, and validated in one call.
+func Benchmark_Pedantigo_Unmarshal_Complex(b *testing.B) {
+	if _, err := validator.Unmarshal[OrderPedantigo](ValidOrderJSON); err != nil { // warm cache
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		if _, err := validator.Unmarshal[OrderPedantigo](ValidOrderJSON); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
 
@@ -90,7 +126,7 @@ func Benchmark_Pedantigo_JSONValidate_Complex(b *testing.B) {
 func Benchmark_Pedantigo_New_Simple(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		_ = pedantigo.New[UserPedantigo]()
+		_ = validator.New[UserPedantigo]()
 	}
 }
 
@@ -98,7 +134,7 @@ func Benchmark_Pedantigo_New_Simple(b *testing.B) {
 func Benchmark_Pedantigo_New_Complex(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		_ = pedantigo.New[OrderPedantigo]()
+		_ = validator.New[OrderPedantigo]()
 	}
 }
 
@@ -110,18 +146,18 @@ func Benchmark_Pedantigo_New_Complex(b *testing.B) {
 func Benchmark_Pedantigo_Schema_Uncached(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		v := pedantigo.New[UserPedantigo]()
+		v := validator.New[UserPedantigo]()
 		_ = v.Schema()
 	}
 }
 
 // Benchmark_Pedantigo_Schema_Cached measures cached schema retrieval
 func Benchmark_Pedantigo_Schema_Cached(b *testing.B) {
-	_ = pedantigo.Schema[UserPedantigo]() // warm cache
+	_ = validator.Schema[UserPedantigo]() // warm cache
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		_ = pedantigo.Schema[UserPedantigo]()
+		_ = validator.Schema[UserPedantigo]()
 	}
 }
 
@@ -133,18 +169,18 @@ func Benchmark_Pedantigo_Schema_Cached(b *testing.B) {
 func Benchmark_Pedantigo_OpenAPI_Uncached(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		v := pedantigo.New[UserPedantigo]()
+		v := validator.New[UserPedantigo]()
 		_ = v.SchemaOpenAPI()
 	}
 }
 
 // Benchmark_Pedantigo_OpenAPI_Cached measures cached OpenAPI schema retrieval
 func Benchmark_Pedantigo_OpenAPI_Cached(b *testing.B) {
-	_ = pedantigo.SchemaOpenAPI[UserPedantigo]() // warm cache
+	_ = validator.SchemaOpenAPI[UserPedantigo]() // warm cache
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		_ = pedantigo.SchemaOpenAPI[UserPedantigo]()
+		_ = validator.SchemaOpenAPI[UserPedantigo]()
 	}
 }
 
@@ -155,10 +191,10 @@ func Benchmark_Pedantigo_OpenAPI_Cached(b *testing.B) {
 // Benchmark_Pedantigo_Marshal_Simple measures validate + JSON marshal
 func Benchmark_Pedantigo_Marshal_Simple(b *testing.B) {
 	user := ValidUserPedantigo
-	_, _ = pedantigo.Marshal(&user) // warm cache
+	_, _ = validator.Marshal(&user) // warm cache
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		_, _ = pedantigo.Marshal(&user)
+		_, _ = validator.Marshal(&user)
 	}
 }

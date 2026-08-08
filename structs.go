@@ -10,11 +10,11 @@ package benchmarks
 
 // Pedantigo version
 type UserPedantigo struct {
-	Name     string `json:"name" pedantigo:"required,min=2,max=100"`
-	Email    string `json:"email" pedantigo:"required,email"`
-	Age      int    `json:"age" pedantigo:"min=0,max=150"`
-	Website  string `json:"website" pedantigo:"url"`
-	Username string `json:"username" pedantigo:"alphanum,min=3,max=20"`
+	Name     string `json:"name" validate:"required,min=2,max=100"`
+	Email    string `json:"email" validate:"required,email"`
+	Age      int    `json:"age" validate:"min=0,max=150"`
+	Website  string `json:"website" validate:"url"`
+	Username string `json:"username" validate:"alphanum,min=3,max=20"`
 }
 
 // go-playground/validator version (same tags)
@@ -158,32 +158,32 @@ type ConfigHuma struct {
 
 // Pedantigo nested types
 type AddressPedantigo struct {
-	Street  string `json:"street" pedantigo:"required,min=5"`
-	City    string `json:"city" pedantigo:"required"`
-	Country string `json:"country" pedantigo:"required,len=2"`
-	Zip     string `json:"zip" pedantigo:"required"`
+	Street  string `json:"street" validate:"required,min=5"`
+	City    string `json:"city" validate:"required"`
+	Country string `json:"country" validate:"required,len=2"`
+	Zip     string `json:"zip" validate:"required"`
 }
 
 type CustomerPedantigo struct {
-	ID      string           `json:"id" pedantigo:"required,uuid"`
-	Name    string           `json:"name" pedantigo:"required,min=2"`
-	Email   string           `json:"email" pedantigo:"required,email"`
-	Address AddressPedantigo `json:"address" pedantigo:"required"`
+	ID      string           `json:"id" validate:"required,uuid"`
+	Name    string           `json:"name" validate:"required,min=2"`
+	Email   string           `json:"email" validate:"required,email"`
+	Address AddressPedantigo `json:"address" validate:"required"`
 }
 
 type OrderItemPedantigo struct {
-	SKU      string  `json:"sku" pedantigo:"required,min=3"`
-	Name     string  `json:"name" pedantigo:"required"`
-	Quantity int     `json:"quantity" pedantigo:"required,min=1"`
-	Price    float64 `json:"price" pedantigo:"required,gt=0"`
+	SKU      string  `json:"sku" validate:"required,min=3"`
+	Name     string  `json:"name" validate:"required"`
+	Quantity int     `json:"quantity" validate:"required,min=1"`
+	Price    float64 `json:"price" validate:"required,gt=0"`
 }
 
 type OrderPedantigo struct {
-	ID       string               `json:"id" pedantigo:"required,uuid"`
-	Customer CustomerPedantigo    `json:"customer" pedantigo:"required"`
-	Items    []OrderItemPedantigo `json:"items" pedantigo:"required,min=1,dive"`
-	Total    float64              `json:"total" pedantigo:"required,gt=0"`
-	Notes    string               `json:"notes" pedantigo:"max=500"`
+	ID       string               `json:"id" validate:"required,uuid"`
+	Customer CustomerPedantigo    `json:"customer" validate:"required"`
+	Items    []OrderItemPedantigo `json:"items" validate:"required,min=1,dive"`
+	Total    float64              `json:"total" validate:"required,gt=0"`
+	Notes    string               `json:"notes" validate:"max=500"`
 }
 
 // Playground nested types
@@ -221,26 +221,26 @@ type OrderPlayground struct {
 // ----------------------------------------------------------------------------
 
 type ConfigPedantigo struct {
-	AppName        string `json:"app_name" pedantigo:"required,min=1,max=100"`
-	Version        string `json:"version" pedantigo:"required"`
-	Environment    string `json:"environment" pedantigo:"required,oneof=dev staging prod"`
+	AppName        string `json:"app_name" validate:"required,min=1,max=100"`
+	Version        string `json:"version" validate:"required"`
+	Environment    string `json:"environment" validate:"required,oneof=dev staging prod"`
 	Debug          bool   `json:"debug"`
-	LogLevel       string `json:"log_level" pedantigo:"oneof=debug info warn error"`
-	Port           int    `json:"port" pedantigo:"required,min=1,max=65535"`
-	Host           string `json:"host" pedantigo:"required"`
-	DatabaseURL    string `json:"database_url" pedantigo:"required,url"`
-	RedisURL       string `json:"redis_url" pedantigo:"url"`
-	MaxConnections int    `json:"max_connections" pedantigo:"min=1,max=1000"`
-	Timeout        int    `json:"timeout" pedantigo:"min=1,max=300"`
-	RetryCount     int    `json:"retry_count" pedantigo:"min=0,max=10"`
+	LogLevel       string `json:"log_level" validate:"oneof=debug info warn error"`
+	Port           int    `json:"port" validate:"required,min=1,max=65535"`
+	Host           string `json:"host" validate:"required"`
+	DatabaseURL    string `json:"database_url" validate:"required,url"`
+	RedisURL       string `json:"redis_url" validate:"url"`
+	MaxConnections int    `json:"max_connections" validate:"min=1,max=1000"`
+	Timeout        int    `json:"timeout" validate:"min=1,max=300"`
+	RetryCount     int    `json:"retry_count" validate:"min=0,max=10"`
 	CacheEnabled   bool   `json:"cache_enabled"`
-	CacheTTL       int    `json:"cache_ttl" pedantigo:"min=0"`
-	RateLimit      int    `json:"rate_limit" pedantigo:"min=0"`
-	APIKey         string `json:"api_key" pedantigo:"required,min=32"`
-	SecretKey      string `json:"secret_key" pedantigo:"required,min=32"`
+	CacheTTL       int    `json:"cache_ttl" validate:"min=0"`
+	RateLimit      int    `json:"rate_limit" validate:"min=0"`
+	APIKey         string `json:"api_key" validate:"required,min=32"`
+	SecretKey      string `json:"secret_key" validate:"required,min=32"`
 	AllowedOrigins string `json:"allowed_origins"`
 	EnableMetrics  bool   `json:"enable_metrics"`
-	MetricsPort    int    `json:"metrics_port" pedantigo:"min=1,max=65535"`
+	MetricsPort    int    `json:"metrics_port" validate:"min=1,max=65535"`
 }
 
 type ConfigPlayground struct {

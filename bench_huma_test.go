@@ -18,17 +18,17 @@ import (
 
 // Benchmark_Huma_Validate_Simple - Huma cannot validate typed structs
 func Benchmark_Huma_Validate_Simple(b *testing.B) {
-	b.Skip("Huma validates map[string]any from JSON, not typed structs - see UnmarshalMap benchmarks")
+	b.Skip("Huma validates map[string]any from JSON, not typed structs - see Unmarshal benchmarks")
 }
 
 // Benchmark_Huma_Validate_Complex - Huma cannot validate typed structs
 func Benchmark_Huma_Validate_Complex(b *testing.B) {
-	b.Skip("Huma validates map[string]any from JSON, not typed structs - see UnmarshalMap benchmarks")
+	b.Skip("Huma validates map[string]any from JSON, not typed structs - see Unmarshal benchmarks")
 }
 
 // Benchmark_Huma_Validate_Large - Huma cannot validate typed structs
 func Benchmark_Huma_Validate_Large(b *testing.B) {
-	b.Skip("Huma validates map[string]any from JSON, not typed structs - see UnmarshalMap benchmarks")
+	b.Skip("Huma validates map[string]any from JSON, not typed structs - see Unmarshal benchmarks")
 }
 
 // ----------------------------------------------------------------------------

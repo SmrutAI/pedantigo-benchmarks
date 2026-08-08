@@ -1,7 +1,6 @@
 package benchmarks
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/pasqal-io/godasse/deserialize"
@@ -32,13 +31,17 @@ func Benchmark_Godasse_Validate_Large(b *testing.B) {
 }
 
 // ----------------------------------------------------------------------------
-// JSONValidate (JSON -> map -> struct + validate)
+// Unmarshal (single-call JSON decode + validate, via DeserializeDict)
 // ----------------------------------------------------------------------------
 
-// Benchmark_Godasse_JSONValidate_Simple - JSON -> map -> struct + validate
-// NOTE: JSON parsing is included in the timer for fair comparison with Pedantigo,
-// which also parses JSON inside its Unmarshal function.
-func Benchmark_Godasse_JSONValidate_Simple(b *testing.B) {
+// Benchmark_Godasse_Unmarshal_Simple - JSON bytes -> validated struct in one
+// call, via godasse's own DeserializeBytes (which decodes internally and then
+// calls DeserializeDict, invoking each result's Validate() method - see
+// vendor/github.com/pasqal-io/godasse/deserialize/deserialize.go:371-382).
+// This has the same (bytes in, *T out) shape as Pedantigo.Unmarshal and
+// godantic.Unmarshal, unlike the two-step decode-then-validate pattern in
+// Benchmark_Playground_JSONValidate_Simple.
+func Benchmark_Godasse_Unmarshal_Simple(b *testing.B) {
 	deserializer, err := deserialize.MakeMapDeserializer[UserGodasse](deserialize.Options{
 		Unmarshaler: jsonPkg.Driver,
 		MainTagName: "json",
@@ -49,25 +52,23 @@ func Benchmark_Godasse_JSONValidate_Simple(b *testing.B) {
 
 	jsonData := ValidUserJSON
 
-	// warm
-	dict := make(jsonPkg.JSON)
-	_ = json.Unmarshal(jsonData, &dict)
-	_, _ = deserializer.DeserializeDict(dict)
+	if _, err := deserializer.DeserializeBytes(jsonData); err != nil { // warm
+		b.Fatal(err)
+	}
 
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		// Include JSON parsing for fair comparison - Pedantigo.Unmarshal also parses JSON
-		dict := make(jsonPkg.JSON)
-		_ = json.Unmarshal(jsonData, &dict)
-		_, _ = deserializer.DeserializeDict(dict)
+		if _, err := deserializer.DeserializeBytes(jsonData); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
 
-// Benchmark_Godasse_JSONValidate_Complex - JSON -> map -> struct + validate
-// NOTE: JSON parsing is included in the timer for fair comparison with Pedantigo,
-// which also parses JSON inside its Unmarshal function.
-func Benchmark_Godasse_JSONValidate_Complex(b *testing.B) {
+// Benchmark_Godasse_Unmarshal_Complex - JSON bytes -> validated struct in one
+// call, for a nested struct. See Benchmark_Godasse_Unmarshal_Simple for why
+// this calls DeserializeBytes directly rather than replicating its internals.
+func Benchmark_Godasse_Unmarshal_Complex(b *testing.B) {
 	deserializer, err := deserialize.MakeMapDeserializer[OrderGodasse](deserialize.Options{
 		Unmarshaler: jsonPkg.Driver,
 		MainTagName: "json",
@@ -78,18 +79,16 @@ func Benchmark_Godasse_JSONValidate_Complex(b *testing.B) {
 
 	jsonData := ValidOrderJSON
 
-	// warm
-	dict := make(jsonPkg.JSON)
-	_ = json.Unmarshal(jsonData, &dict)
-	_, _ = deserializer.DeserializeDict(dict)
+	if _, err := deserializer.DeserializeBytes(jsonData); err != nil { // warm
+		b.Fatal(err)
+	}
 
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		// Include JSON parsing for fair comparison - Pedantigo.Unmarshal also parses JSON
-		dict := make(jsonPkg.JSON)
-		_ = json.Unmarshal(jsonData, &dict)
-		_, _ = deserializer.DeserializeDict(dict)
+		if _, err := deserializer.DeserializeBytes(jsonData); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
 

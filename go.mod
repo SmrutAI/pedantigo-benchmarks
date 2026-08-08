@@ -3,7 +3,7 @@ module pedantigo-benchmarks
 go 1.24.0
 
 require (
-	github.com/SmrutAI/pedantigo v0.0.0-00010101000000-000000000000
+	github.com/SmrutAI/pedantigo/v2 v2.0.0
 	github.com/danielgtaylor/huma/v2 v2.34.1
 	github.com/deepankarm/godantic v0.0.0-20251202064107-1b3e8415c487
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
@@ -28,4 +28,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/SmrutAI/pedantigo => ./third_party/pedantigo
+replace github.com/SmrutAI/pedantigo/v2 => ./third_party/pedantigo

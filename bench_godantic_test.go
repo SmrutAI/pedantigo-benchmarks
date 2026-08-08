@@ -60,17 +60,39 @@ func Benchmark_Godantic_Validate_Large(b *testing.B) {
 }
 
 // ----------------------------------------------------------------------------
-// Pedantigo-only features (Skip)
+// Unmarshal (single-call JSON decode + defaults + validate)
 // ----------------------------------------------------------------------------
 
-// Benchmark_Godantic_UnmarshalMap_Simple - Not applicable to godantic
-func Benchmark_Godantic_UnmarshalMap_Simple(b *testing.B) {
-	b.Skip("UnmarshalMap is a Pedantigo-only feature")
+// Benchmark_Godantic_Unmarshal_Simple tests godantic's own Validator.Unmarshal:
+// JSON bytes decoded, defaults applied, and validated in one call.
+func Benchmark_Godantic_Unmarshal_Simple(b *testing.B) {
+	v := godantic.NewValidator[UserGodantic]()
+	if _, errs := v.Unmarshal(ValidUserJSON); len(errs) > 0 { // warm
+		b.Fatal(errs)
+	}
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		if _, errs := v.Unmarshal(ValidUserJSON); len(errs) > 0 {
+			b.Fatal(errs)
+		}
+	}
 }
 
-// Benchmark_Godantic_UnmarshalMap_Complex - Not applicable to godantic
-func Benchmark_Godantic_UnmarshalMap_Complex(b *testing.B) {
-	b.Skip("UnmarshalMap is a Pedantigo-only feature")
+// Benchmark_Godantic_Unmarshal_Complex tests godantic's own Validator.Unmarshal
+// for a nested struct: JSON bytes decoded, defaults applied, and validated in one call.
+func Benchmark_Godantic_Unmarshal_Complex(b *testing.B) {
+	v := godantic.NewValidator[OrderGodantic]()
+	if _, errs := v.Unmarshal(ValidOrderJSON); len(errs) > 0 { // warm
+		b.Fatal(errs)
+	}
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		if _, errs := v.Unmarshal(ValidOrderJSON); len(errs) > 0 {
+			b.Fatal(errs)
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------

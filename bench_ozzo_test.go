@@ -115,17 +115,17 @@ func Benchmark_Ozzo_Validate_Large(b *testing.B) {
 }
 
 // ----------------------------------------------------------------------------
-// Pedantigo-only features (Skip)
+// Unmarshal (not applicable - Ozzo has no JSON decode step)
 // ----------------------------------------------------------------------------
 
-// Benchmark_Ozzo_UnmarshalMap_Simple - Not applicable to Ozzo
-func Benchmark_Ozzo_UnmarshalMap_Simple(b *testing.B) {
-	b.Skip("UnmarshalMap is a Pedantigo-only feature")
+// Benchmark_Ozzo_Unmarshal_Simple - Not applicable to Ozzo
+func Benchmark_Ozzo_Unmarshal_Simple(b *testing.B) {
+	b.Skip("Ozzo has no JSON decode step; validation-only, not comparable")
 }
 
-// Benchmark_Ozzo_UnmarshalMap_Complex - Not applicable to Ozzo
-func Benchmark_Ozzo_UnmarshalMap_Complex(b *testing.B) {
-	b.Skip("UnmarshalMap is a Pedantigo-only feature")
+// Benchmark_Ozzo_Unmarshal_Complex - Not applicable to Ozzo
+func Benchmark_Ozzo_Unmarshal_Complex(b *testing.B) {
+	b.Skip("Ozzo has no JSON decode step; validation-only, not comparable")
 }
 
 // ----------------------------------------------------------------------------

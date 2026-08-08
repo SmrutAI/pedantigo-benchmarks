@@ -1,6 +1,7 @@
 # Benchmark outputs
 report.csv
 benchmark-output.txt
+BENCHMARK_PR.md
 
 # Cloned repos (runtime)
 third_party/
