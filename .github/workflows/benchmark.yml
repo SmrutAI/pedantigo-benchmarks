@@ -62,6 +62,10 @@ jobs:
           git add BENCHMARK.md
           git diff --staged --quiet || git commit -m "chore: update benchmark report (pedantigo $REF)"
 
+          # Only BENCHMARK.md is committed. Discard any go.sum/go.mod churn produced by
+          # `go mod tidy` during setup so the rebase below is not blocked by unstaged changes.
+          git checkout -- .
+
           # Pull latest and rebase before pushing (handles concurrent runs)
           if ! git pull --rebase origin main; then
             echo "conflict=true" >> $GITHUB_OUTPUT
