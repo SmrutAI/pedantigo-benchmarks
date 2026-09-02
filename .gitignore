@@ -5,6 +5,7 @@ BENCHMARK_PR.md
 
 # Cloned repos (runtime)
 third_party/
+vendor/
 
 # Go
 *.exe
