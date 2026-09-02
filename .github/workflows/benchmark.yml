@@ -15,6 +15,11 @@ concurrency:
 permissions:
   contents: write
 
+# Ensure no git command can block the runner waiting for interactive input.
+env:
+  GIT_TERMINAL_PROMPT: "0"   # fail fast instead of prompting for credentials
+  GIT_EDITOR: "true"         # never open an editor (e.g. during a rebase)
+
 jobs:
   benchmark:
     runs-on: ubuntu-latest
